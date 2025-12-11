@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAdmin } from '../contexts/AdminContext';
 import { useLocation } from 'react-router-dom';
-import { LogIn, LogOut, Package, MapPin, Star, PlusCircle, Edit, Trash2, Save, X, Sparkles, Upload, TrendingUp, Percent, Zap, Code, Palette, Wrench, Archive, Truck, Search } from 'lucide-react';
+import { LogIn, LogOut, Package, MapPin, Star, PlusCircle, Edit, Trash2, Save, X, Sparkles, Upload, TrendingUp, Percent, Zap, Code, Palette, Wrench, Archive, Truck, Search, CreditCard } from 'lucide-react';
 import { toast } from '../hooks/use-toast';
 import { categories } from '../mock';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
