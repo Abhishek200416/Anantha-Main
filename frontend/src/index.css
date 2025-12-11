@@ -113,3 +113,178 @@ code {
         border-bottom-color: inherit;
     }
 }
+
+/* Custom animations */
+@keyframes slide-down {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -100%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.animate-slide-down {
+    animation: slide-down 0.4s ease-out forwards;
+}
+
+@keyframes bounce-slow {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+.animate-bounce-slow {
+    animation: bounce-slow 2s ease-in-out infinite;
+}
+
+/* Custom text size utility - Significantly increased line-height for Telugu/Hindi script to prevent character cutting */
+
+/* Base text sizes with extra line-height */
+.text-xs {
+    line-height: 1.8 !important;
+}
+
+.text-sm {
+    line-height: 1.8 !important;
+}
+
+.text-base {
+    line-height: 1.8 !important;
+}
+
+.text-lg {
+    line-height: 1.8 !important;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+    line-height: 2 !important;
+}
+
+.text-2xl {
+    font-size: 1.5rem;
+    line-height: 1.8 !important;
+}
+
+.text-3xl {
+    font-size: 1.875rem;
+    line-height: 1.8 !important;
+}
+
+.text-4xl {
+    font-size: 2.25rem;
+    line-height: 1.8 !important;
+}
+
+.text-5xl {
+    font-size: 3rem;
+    line-height: 1.7 !important;
+}
+
+.text-6xl {
+    font-size: 3.75rem;
+    line-height: 1.5 !important;
+}
+
+.text-7xl {
+    font-size: 4.5rem;
+    line-height: 1.5 !important;
+}
+
+/* Medium screen sizes (768px+) */
+@media (min-width: 768px) {
+    .md\:text-xs {
+        line-height: 1.8 !important;
+    }
+    
+    .md\:text-sm {
+        line-height: 1.8 !important;
+    }
+    
+    .md\:text-base {
+        line-height: 1.8 !important;
+    }
+    
+    .md\:text-lg {
+        line-height: 1.8 !important;
+    }
+    
+    .md\:text-xl {
+        font-size: 1.25rem;
+        line-height: 2 !important;
+    }
+    
+    .md\:text-2xl {
+        font-size: 1.5rem;
+        line-height: 1.9 !important;
+    }
+    
+    .md\:text-3xl {
+        font-size: 1.875rem;
+        line-height: 1.8 !important;
+    }
+    
+    .md\:text-4xl {
+        font-size: 2.25rem;
+        line-height: 1.8 !important;
+    }
+    
+    .md\:text-5xl {
+        font-size: 3rem;
+        line-height: 1.7 !important;
+    }
+    
+    .md\:text-6xl {
+        font-size: 3.75rem;
+        line-height: 1.5 !important;
+    }
+    
+    .md\:text-7xl {
+        font-size: 4.5rem;
+        line-height: 1.5 !important;
+    }
+}
+
+/* Large screen sizes (1024px+) */
+@media (min-width: 1024px) {
+    .lg\:text-xl {
+        font-size: 1.25rem;
+        line-height: 2 !important;
+    }
+    
+    .lg\:text-2xl {
+        font-size: 1.5rem;
+        line-height: 1.9 !important;
+    }
+    
+    .lg\:text-3xl {
+        font-size: 1.875rem;
+        line-height: 1.8 !important;
+    }
+    
+    .lg\:text-4xl {
+        font-size: 2.25rem;
+        line-height: 1.8 !important;
+    }
+    
+    .lg\:text-5xl {
+        font-size: 3rem;
+        line-height: 1.7 !important;
+    }
+    
+    .lg\:text-6xl {
+        font-size: 3.75rem;
+        line-height: 1.5 !important;
+    }
+    
+    .lg\:text-7xl {
+        font-size: 4.5rem;
+        line-height: 1.5 !important;
+    }
+}
