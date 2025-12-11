@@ -75,12 +75,13 @@ const ProductCard = ({ product }) => {
         </div>
       </div>
 
-      {/* Product Image - Optimized with Lazy Loading */}
+      {/* Product Image - Eager Loading for Better UX */}
       <div className="relative overflow-hidden bg-gradient-to-br from-orange-50 to-red-50">
         <OptimizedImage
           src={product.image}
           alt={productName}
-          loading="lazy"
+          loading="eager"
+          priority={true}
           className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
