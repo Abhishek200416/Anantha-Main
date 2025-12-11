@@ -9,7 +9,7 @@ import json
 import time
 from datetime import datetime
 
-BACKEND_URL = "https://swift-recipe-app.preview.emergentagent.com/api"
+BACKEND_URL = "https://recipe-buddy-28.preview.emergentagent.com/api"
 
 def admin_login():
     """Login as admin and get auth token"""

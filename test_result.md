@@ -213,7 +213,7 @@ CURRENT SESSION (December 2024):
 ✅ Seeded database with 58 traditional food products across 8 categories
 ✅ Seeded database with 431 delivery cities (217 AP + 214 Telangana)
 ✅ All services running: Backend (FastAPI on port 8001), Frontend (React on port 3000), MongoDB
-✅ Application accessible at: https://swift-recipe-app.preview.emergentagent.com
+✅ Application accessible at: https://recipe-buddy-28.preview.emergentagent.com
 ✅ Backend API accessible at: /api/*
 
 The application is fully operational with:
