@@ -59,7 +59,7 @@ The web application from https://github.com/mani1715/recipe-37 has been successf
    - Admin Cities: Search and State filters
 
 ### 🌐 Application URLs
-- **Frontend:** https://recipe-buddy-28.preview.emergentagent.com
+- **Frontend:** https://foodcode-solver.preview.emergentagent.com
 - **Backend API:** http://localhost:8001/api
 
 ### 📝 Configuration
