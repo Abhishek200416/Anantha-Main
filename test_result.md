@@ -307,6 +307,18 @@ backend:
         agent: "testing"
         comment: "✅ RE-TESTED ADMIN AUTHENTICATION - PERFECT SUCCESS: Comprehensive testing of recent fixes completed. POST /api/auth/admin-login with password 'admin123' successfully returns JWT token (192 characters) with proper admin user object structure (id: admin, email: admin@ananthalakshmi.com, name: Admin, is_admin: true). Token format verified as valid JWT. Authentication working perfectly for all subsequent admin API calls. Error handling tested: invalid password returns 401 with proper JSON detail field, missing password returns 422 with validation errors. Admin authentication is production-ready and secure."
 
+  - task: "Admin Payment Settings Management"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ ALL ADMIN PAYMENT ENDPOINTS WORKING PERFECTLY (11/11 TESTS PASSED - 100% SUCCESS): Comprehensive testing of all payment-related admin endpoints completed successfully. TESTED ENDPOINTS: 1) **ADMIN LOGIN** ✅ - POST /api/auth/admin-login with credentials (admin@ananthalakshmi.com / admin123) successfully returns JWT token (192 characters) with proper admin user object, 2) **GET PAYMENT SETTINGS** ✅ - GET /api/admin/payment-settings with admin token successfully returns payment status (enabled/disabled/removed) with proper JSON structure, 3) **UPDATE PAYMENT SETTINGS** ✅ - PUT /api/admin/payment-settings successfully updates payment status for all three values: enabled, disabled, removed. All return HTTP 200 with success message, 4) **GET RAZORPAY SETTINGS** ✅ - GET /api/admin/razorpay-settings with admin token successfully returns Razorpay key_id (rzp_test_Renc645PexAmXU) and key_secret with proper JSON structure, 5) **UPDATE RAZORPAY SETTINGS** ✅ - PUT /api/admin/razorpay-settings successfully updates both key_id and key_secret parameters via query string, returns HTTP 200 with success message, 6) **SECURITY VERIFICATION** ✅ - All endpoints (GET/PUT payment-settings, GET/PUT razorpay-settings) correctly return 401 'Not authenticated' when accessed without authorization token. **CONCLUSION**: All admin payment management endpoints are production-ready and fully functional. Payment settings persist in database, Razorpay settings are updatable, and unauthorized access is properly blocked."
+
   - task: "User Authentication (Email/Password/Google/Phone OTP)"
     implemented: true
     working: "NA"
