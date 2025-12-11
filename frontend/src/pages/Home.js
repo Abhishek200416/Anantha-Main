@@ -190,16 +190,16 @@ const Home = () => {
         
         setAllProducts(productsData);
         
-        // Preload product images with priority (first 6 immediately, rest in background)
+        // Preload ALL product images immediately for better UX (no lazy loading)
         if (productsData.length > 0) {
           const imageUrls = productsData
             .filter(p => p.image)
             .map(p => p.image);
           
-          // Preload with priority - first 6 images load immediately, rest in batches
-          imagePreloader.preloadWithPriority(imageUrls, 6)
+          // Preload all images at once without delays
+          imagePreloader.preloadImages(imageUrls)
             .then(() => {
-              console.log('✅ Product images preloaded:', imagePreloader.getCacheSize());
+              console.log('✅ All product images preloaded:', imagePreloader.getCacheSize());
             })
             .catch(err => {
               console.error('Image preload error:', err);
