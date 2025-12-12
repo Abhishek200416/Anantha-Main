@@ -72,6 +72,10 @@ const Home = () => {
           
           const addr = data.address;
           
+          // Get state to help narrow down cities
+          const detectedState = addr.state;
+          console.log('🌍 Detected State:', detectedState);
+          
           // Try to match with our delivery locations - prioritize exact matches
           const possibleCities = [
             addr.city,
@@ -80,23 +84,36 @@ const Home = () => {
             addr.county,
             addr.district,
             addr.city_district,
-            addr.village
+            addr.village,
+            addr.suburb
           ].filter(Boolean);
           
-          console.log('🏙️ Possible cities:', possibleCities);
-          console.log('📍 Our delivery cities:', deliveryLocations.map(l => l.name));
+          console.log('🏙️ Possible cities from location:', possibleCities);
+          console.log('📍 Our delivery cities:', deliveryLocations.map(l => `${l.name}, ${l.state}`));
           
           let matchedCity = '';
+          let matchedLocation = null;
           
-          // First try exact match
+          // Filter cities by state first if we have state info
+          let relevantLocations = deliveryLocations;
+          if (detectedState) {
+            relevantLocations = deliveryLocations.filter(loc => 
+              loc.state.toLowerCase().includes(detectedState.toLowerCase()) ||
+              detectedState.toLowerCase().includes(loc.state.toLowerCase())
+            );
+            console.log('🗺️ Filtered to', relevantLocations.length, 'cities in', detectedState);
+          }
+          
+          // First try exact match (case-insensitive)
           for (const possibleCity of possibleCities) {
-            const exactMatch = deliveryLocations.find(
+            const exactMatch = relevantLocations.find(
               loc => loc.name.toLowerCase() === possibleCity.toLowerCase()
             );
             
             if (exactMatch) {
               matchedCity = exactMatch.name;
-              console.log('✅ Exact match found:', matchedCity);
+              matchedLocation = exactMatch;
+              console.log('✅ Exact match found:', matchedCity, ',', exactMatch.state);
               break;
             }
           }
@@ -104,7 +121,7 @@ const Home = () => {
           // If no exact match, try partial match
           if (!matchedCity) {
             for (const possibleCity of possibleCities) {
-              const partialMatch = deliveryLocations.find(
+              const partialMatch = relevantLocations.find(
                 loc => 
                   loc.name.toLowerCase().includes(possibleCity.toLowerCase()) ||
                   possibleCity.toLowerCase().includes(loc.name.toLowerCase())
@@ -112,9 +129,29 @@ const Home = () => {
               
               if (partialMatch) {
                 matchedCity = partialMatch.name;
-                console.log('✅ Partial match found:', matchedCity);
+                matchedLocation = partialMatch;
+                console.log('✅ Partial match found:', matchedCity, ',', partialMatch.state);
                 break;
               }
+            }
+          }
+          
+          // If still no match, try finding nearest city by checking all locations in the detected state
+          if (!matchedCity && detectedState && relevantLocations.length > 0) {
+            // Use the first major city in the state as fallback
+            const majorCities = relevantLocations.filter(loc => 
+              ['Visakhapatnam', 'Vijayawada', 'Guntur', 'Hyderabad', 'Warangal', 'Nizamabad'].includes(loc.name)
+            );
+            
+            if (majorCities.length > 0) {
+              matchedCity = majorCities[0].name;
+              matchedLocation = majorCities[0];
+              console.log('📍 Using major city as fallback:', matchedCity);
+            } else if (relevantLocations.length > 0) {
+              // Just use first city in the state
+              matchedCity = relevantLocations[0].name;
+              matchedLocation = relevantLocations[0];
+              console.log('📍 Using first available city in state:', matchedCity);
             }
           }
           
