@@ -490,18 +490,35 @@ const Home = () => {
         
         <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
         
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 mt-6 md:mt-8">
-          {filteredProducts.map((product) => (
-            <div key={product.id} id={`product-${product.id}`}>
-              <ProductCard product={product} />
+        {/* Loading State - Show while products/images are loading */}
+        {loadingProducts && (
+          <div className="flex flex-col items-center justify-center py-16 md:py-24">
+            <div className="relative">
+              <div className="w-16 h-16 md:w-20 md:h-20 border-4 border-orange-200 border-t-orange-600 rounded-full animate-spin"></div>
+              <div className="absolute inset-0 w-16 h-16 md:w-20 md:h-20 border-4 border-transparent border-b-red-600 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1s' }}></div>
             </div>
-          ))}
-        </div>
-
-        {filteredProducts.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-base md:text-lg">No products found in this category.</p>
+            <p className="mt-6 text-gray-600 text-base md:text-lg font-medium animate-pulse">Loading delicious products...</p>
+            <p className="mt-2 text-gray-400 text-sm">Please wait while we prepare everything for you</p>
           </div>
+        )}
+
+        {/* Products Grid - Show only after loading */}
+        {!loadingProducts && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 mt-6 md:mt-8">
+              {filteredProducts.map((product) => (
+                <div key={product.id} id={`product-${product.id}`}>
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+
+            {filteredProducts.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500 text-base md:text-lg">No products found in this category.</p>
+              </div>
+            )}
+          </>
         )}
       </section>
 
