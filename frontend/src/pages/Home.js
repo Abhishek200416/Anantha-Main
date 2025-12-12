@@ -173,6 +173,9 @@ const Home = () => {
   // Fetch products based on selected city and state
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoadingProducts(true);
+      setImagesLoaded(false);
+      
       try {
         let url = `${API}/products`;
         const params = new URLSearchParams();
@@ -190,26 +193,31 @@ const Home = () => {
         const response = await axios.get(url);
         const productsData = response.data || [];
         
-        setAllProducts(productsData);
-        
-        // Preload ALL product images immediately for better UX (no lazy loading)
+        // Preload ALL product images BEFORE showing products
         if (productsData.length > 0) {
           const imageUrls = productsData
             .filter(p => p.image)
             .map(p => p.image);
           
-          // Preload all images at once without delays
-          imagePreloader.preloadImages(imageUrls)
-            .then(() => {
-              console.log('✅ All product images preloaded:', imagePreloader.getCacheSize());
-            })
-            .catch(err => {
-              console.error('Image preload error:', err);
-            });
+          console.log('🖼️ Starting to preload', imageUrls.length, 'product images...');
+          
+          // Preload all images and wait for completion
+          await imagePreloader.preloadImages(imageUrls);
+          console.log('✅ All', imagePreloader.getCacheSize(), 'product images preloaded!');
+          
+          // Now set products AFTER images are loaded
+          setAllProducts(productsData);
+          setImagesLoaded(true);
+        } else {
+          setAllProducts(productsData);
+          setImagesLoaded(true);
         }
       } catch (error) {
         console.error('Error fetching products:', error);
         setAllProducts(contextProducts);
+        setImagesLoaded(true);
+      } finally {
+        setLoadingProducts(false);
       }
     };
     fetchProducts();
