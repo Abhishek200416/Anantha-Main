@@ -280,7 +280,7 @@ function Checkout() {
   };
 
   const sendWhatsAppMessages = (orderData, orderId, trackingCode) => {
-    // Create WhatsApp message with order details INCLUDING PRODUCT IMAGES
+    // Create WhatsApp message with order details INCLUDING CLICKABLE PRODUCT IMAGE LINKS
     const message = `🛒 *New Order from Customer*
 
 📦 *Order ID:* ${orderId}
@@ -300,19 +300,24 @@ City: ${orderData.city}
 State: ${orderData.state}
 Pincode: ${orderData.pincode}
 
-🍱 *Order Items:*
-${orderData.items.map((item, idx) => `${idx + 1}. ${item.name} (${item.weight}) - ₹${item.price} × ${item.quantity} = ₹${item.price * item.quantity}
-📸 Image: ${item.image || 'No image'}`).join('\n\n')}
+🍱 *Order Items with Product Images:*
+${orderData.items.map((item, idx) => `${idx + 1}. *${item.name}*
+   Weight: ${item.weight}
+   Price: ₹${item.price} × ${item.quantity} = ₹${item.price * item.quantity}
+   📸 View Product Image: ${item.image || 'No image available'}`).join('\n\n')}
 
 💰 *Order Summary:*
 Subtotal: ₹${orderData.subtotal}
 Delivery Charge: ₹${orderData.delivery_charge}
-*Total: ₹${orderData.total}*
+━━━━━━━━━━━━━
+*TOTAL: ₹${orderData.total}*
+━━━━━━━━━━━━━
 
-💳 *Payment:* ${orderData.payment_method === 'razorpay' ? 'Online Payment' : 'WhatsApp Booking'}
-📊 *Status:* ${orderData.payment_status === 'completed' ? 'Paid ✅' : 'Pending'}
+💳 *Payment Method:* ${orderData.payment_method === 'razorpay' ? '✅ Online Payment (Razorpay)' : '📱 WhatsApp Booking'}
+📊 *Payment Status:* ${orderData.payment_status === 'completed' ? '✅ PAID' : '⏳ Pending'}
 
-_Order placed via Anantha Home Foods website_`;
+_📱 Order placed via Anantha Home Foods website_
+_📸 Click on image links above to view each product_`;
 
     const encodedMessage = encodeURIComponent(message);
 
