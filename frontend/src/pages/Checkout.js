@@ -745,11 +745,14 @@ _📸 Click on image links above to view each product_`;
       return;
     }
 
+    // Sync WhatsApp with phone if checkbox is checked
+    const finalWhatsApp = useSameForWhatsApp ? customerPhone : customerWhatsApp;
+    
     // Validate all required fields
-    if (!customerName || !customerEmail || !customerPhone || !customerWhatsApp || !doorNo || !street || !city || !state || !pincode) {
+    if (!customerName || !customerEmail || !customerPhone || !finalWhatsApp || !doorNo || !street || !city || !state || !pincode) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields including WhatsApp number",
+        description: "Please fill in all required fields",
         variant: "destructive"
       });
       return;
