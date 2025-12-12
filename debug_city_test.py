@@ -6,7 +6,7 @@ Debug City Detection Issue
 import requests
 import json
 
-BACKEND_URL = "https://foodcode-solver.preview.emergentagent.com/api"
+BACKEND_URL = "https://foodcraft-11.preview.emergentagent.com/api"
 
 def test_city_in_locations():
     """Test if Hyderabad is in locations"""
