@@ -589,8 +589,6 @@ _📸 Click on image links above to view each product_`;
             const detectedState = addr.state || '';
             
             // Smart city detection - ENHANCED ALGORITHM with state filtering
-            // Get detected state to narrow down city search
-            const detectedState = addr.state;
             console.log('🌍 Detected State:', detectedState);
             
             // Try to match with our delivery locations - prioritize exact matches
