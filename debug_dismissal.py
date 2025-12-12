@@ -7,7 +7,7 @@ import requests
 import json
 from datetime import datetime, timezone, timedelta
 
-BACKEND_URL = "https://foodcraft-11.preview.emergentagent.com/api"
+BACKEND_URL = "https://recipe-store-1.preview.emergentagent.com/api"
 
 def debug_dismissal():
     # Login

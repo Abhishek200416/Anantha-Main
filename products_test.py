@@ -12,7 +12,7 @@ from datetime import datetime
 from collections import defaultdict
 
 # Backend URL from environment
-BACKEND_URL = "https://foodcraft-11.preview.emergentagent.com/api"
+BACKEND_URL = "https://recipe-store-1.preview.emergentagent.com/api"
 
 def test_api_endpoint(method, endpoint, headers=None, data=None, description="", expected_status=None):
     """Test a single API endpoint"""
