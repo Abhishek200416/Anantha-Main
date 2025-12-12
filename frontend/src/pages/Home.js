@@ -28,6 +28,8 @@ const Home = () => {
   const [detectingLocation, setDetectingLocation] = useState(false);
   const [showAddCityModal, setShowAddCityModal] = useState(false);
   const [locationNotification, setLocationNotification] = useState(null);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
 
   const t = (key) => getTranslation(language, key);
 
