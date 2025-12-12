@@ -449,21 +449,21 @@ def test_admin_password_change_otp():
     return True
 
 def test_admin_authentication():
-    """Test admin authentication with email and password"""
+    """Test admin authentication with email and password as per review request #2"""
     print("\n" + "="*80)
-    print("🔐 TESTING ADMIN AUTHENTICATION")
+    print("🔐 ADMIN AUTHENTICATION TESTING (REVIEW REQUEST #2)")
     print("="*80)
     
     login_data = {
         "email": "admin@ananthalakshmi.com",
-        "password": ADMIN_PASSWORD
+        "password": "admin123"
     }
     
     success, response_data = test_api_endpoint(
         "POST",
         "/auth/admin-login",
         data=login_data,
-        description="Admin login with email and password 'admin123'"
+        description="Admin login with exact credentials from review request"
     )
     
     if success and response_data:
@@ -498,6 +498,7 @@ def test_admin_authentication():
                 print(f"   - Name: {user.get('name')}")
                 print(f"   - Is Admin: {user.get('is_admin')}")
                 print(f"   - Token Length: {len(token)} characters")
+                print(f"   - JWT Token Format: {token[:20]}...{token[-20:]}")
                 return True, token
             else:
                 print(f"❌ FAILED: Invalid or missing JWT token")
@@ -508,6 +509,249 @@ def test_admin_authentication():
     
     print(f"❌ FAILED: Admin authentication failed")
     return False, None
+
+def test_admin_payment_settings(admin_token):
+    """Test admin payment settings endpoints as per review request #3"""
+    print("\n" + "="*80)
+    print("💳 ADMIN PAYMENT SETTINGS TESTING (REVIEW REQUEST #3)")
+    print("="*80)
+    
+    auth_headers = {
+        "Authorization": f"Bearer {admin_token}",
+        "Content-Type": "application/json"
+    }
+    
+    test_results = []
+    
+    # Test 1: GET /api/admin/payment-settings (with admin token)
+    print("\n--- Test 1: GET Payment Settings (with admin token) ---")
+    success, response_data = test_api_endpoint(
+        "GET",
+        "/admin/payment-settings",
+        headers=auth_headers,
+        description="Get payment settings with admin authentication"
+    )
+    
+    if success and response_data:
+        print(f"✅ SUCCESS: GET payment settings working")
+        print(f"   - Response: {response_data}")
+        test_results.append(("GET Payment Settings (Authenticated)", True))
+    else:
+        print(f"❌ FAILED: GET payment settings failed")
+        test_results.append(("GET Payment Settings (Authenticated)", False))
+    
+    # Test 2: PUT /api/admin/payment-settings?status=enabled (with admin token)
+    print("\n--- Test 2: PUT Payment Settings status=enabled (with admin token) ---")
+    success, response_data = test_api_endpoint(
+        "PUT",
+        "/admin/payment-settings?status=enabled",
+        headers=auth_headers,
+        description="Update payment status to enabled with admin authentication"
+    )
+    
+    if success:
+        print(f"✅ SUCCESS: PUT payment settings (enabled) working")
+        print(f"   - Response: {response_data}")
+        test_results.append(("PUT Payment Settings Enabled", True))
+    else:
+        print(f"❌ FAILED: PUT payment settings (enabled) failed")
+        test_results.append(("PUT Payment Settings Enabled", False))
+    
+    # Test 3: PUT /api/admin/payment-settings?status=disabled (with admin token)
+    print("\n--- Test 3: PUT Payment Settings status=disabled (with admin token) ---")
+    success, response_data = test_api_endpoint(
+        "PUT",
+        "/admin/payment-settings?status=disabled",
+        headers=auth_headers,
+        description="Update payment status to disabled with admin authentication"
+    )
+    
+    if success:
+        print(f"✅ SUCCESS: PUT payment settings (disabled) working")
+        print(f"   - Response: {response_data}")
+        test_results.append(("PUT Payment Settings Disabled", True))
+    else:
+        print(f"❌ FAILED: PUT payment settings (disabled) failed")
+        test_results.append(("PUT Payment Settings Disabled", False))
+    
+    # Test 4: Verify unauthorized access (without token) returns 401
+    print("\n--- Test 4: Verify Unauthorized Access Returns 401 ---")
+    
+    # Test GET without token
+    success, response_data = test_api_endpoint(
+        "GET",
+        "/admin/payment-settings",
+        description="GET payment settings without authentication (should return 401)",
+        expected_status=401
+    )
+    
+    if success:
+        print(f"✅ SUCCESS: GET payment settings correctly returns 401 without auth")
+        test_results.append(("GET Payment Settings Unauthorized", True))
+    else:
+        print(f"❌ FAILED: GET payment settings should return 401 without auth")
+        test_results.append(("GET Payment Settings Unauthorized", False))
+    
+    # Test PUT without token
+    success, response_data = test_api_endpoint(
+        "PUT",
+        "/admin/payment-settings?status=enabled",
+        description="PUT payment settings without authentication (should return 401)",
+        expected_status=401
+    )
+    
+    if success:
+        print(f"✅ SUCCESS: PUT payment settings correctly returns 401 without auth")
+        test_results.append(("PUT Payment Settings Unauthorized", True))
+    else:
+        print(f"❌ FAILED: PUT payment settings should return 401 without auth")
+        test_results.append(("PUT Payment Settings Unauthorized", False))
+    
+    return test_results
+
+def test_admin_razorpay_settings(admin_token):
+    """Test admin Razorpay settings endpoints as per review request #4"""
+    print("\n" + "="*80)
+    print("🔑 ADMIN RAZORPAY SETTINGS TESTING (REVIEW REQUEST #4)")
+    print("="*80)
+    
+    auth_headers = {
+        "Authorization": f"Bearer {admin_token}",
+        "Content-Type": "application/json"
+    }
+    
+    test_results = []
+    
+    # Test 1: GET /api/admin/razorpay-settings (with admin token)
+    print("\n--- Test 1: GET Razorpay Settings (with admin token) ---")
+    success, response_data = test_api_endpoint(
+        "GET",
+        "/admin/razorpay-settings",
+        headers=auth_headers,
+        description="Get Razorpay key_id and key_secret with admin authentication"
+    )
+    
+    if success and response_data:
+        print(f"✅ SUCCESS: GET Razorpay settings working")
+        
+        # Verify expected fields
+        if "key_id" in response_data and "key_secret" in response_data:
+            key_id = response_data.get("key_id")
+            key_secret = response_data.get("key_secret")
+            print(f"   - Key ID: {key_id}")
+            print(f"   - Key Secret: {key_secret[:10]}...{key_secret[-4:] if key_secret else 'None'}")
+            
+            # Verify test credentials from review request
+            if key_id == "rzp_test_Renc645PexAmXU":
+                print(f"   ✅ Key ID matches expected test credentials")
+            else:
+                print(f"   ⚠️  Key ID doesn't match expected: rzp_test_Renc645PexAmXU")
+            
+            test_results.append(("GET Razorpay Settings (Authenticated)", True))
+        else:
+            print(f"❌ FAILED: Missing key_id or key_secret in response")
+            test_results.append(("GET Razorpay Settings (Authenticated)", False))
+    else:
+        print(f"❌ FAILED: GET Razorpay settings failed")
+        test_results.append(("GET Razorpay Settings (Authenticated)", False))
+    
+    # Test 2: PUT /api/admin/razorpay-settings (with admin token)
+    print("\n--- Test 2: PUT Razorpay Settings (with admin token) ---")
+    
+    # Test updating Razorpay keys
+    update_data = {
+        "key_id": "rzp_test_UpdatedKeyId123",
+        "key_secret": "UpdatedKeySecret456"
+    }
+    
+    success, response_data = test_api_endpoint(
+        "PUT",
+        "/admin/razorpay-settings",
+        headers=auth_headers,
+        data=update_data,
+        description="Update Razorpay key_id and key_secret with admin authentication"
+    )
+    
+    if success:
+        print(f"✅ SUCCESS: PUT Razorpay settings working")
+        print(f"   - Response: {response_data}")
+        test_results.append(("PUT Razorpay Settings", True))
+        
+        # Verify the update by getting settings again
+        print("\n   Verifying update by GET request...")
+        success_verify, verify_data = test_api_endpoint(
+            "GET",
+            "/admin/razorpay-settings",
+            headers=auth_headers,
+            description="Verify Razorpay settings were updated"
+        )
+        
+        if success_verify and verify_data:
+            updated_key_id = verify_data.get("key_id")
+            updated_key_secret = verify_data.get("key_secret")
+            
+            if (updated_key_id == "rzp_test_UpdatedKeyId123" and 
+                updated_key_secret == "UpdatedKeySecret456"):
+                print(f"   ✅ Settings successfully updated and verified")
+                test_results.append(("Verify Razorpay Settings Update", True))
+            else:
+                print(f"   ❌ Settings not updated correctly")
+                test_results.append(("Verify Razorpay Settings Update", False))
+        
+        # Restore original settings
+        print("\n   Restoring original settings...")
+        restore_data = {
+            "key_id": "rzp_test_Renc645PexAmXU",
+            "key_secret": "ReA5MNv3beAt068So4iYNq8s"
+        }
+        
+        test_api_endpoint(
+            "PUT",
+            "/admin/razorpay-settings",
+            headers=auth_headers,
+            data=restore_data,
+            description="Restore original Razorpay settings"
+        )
+        
+    else:
+        print(f"❌ FAILED: PUT Razorpay settings failed")
+        test_results.append(("PUT Razorpay Settings", False))
+    
+    # Test 3: Verify unauthorized access (without token) returns 401
+    print("\n--- Test 3: Verify Unauthorized Access Returns 401 ---")
+    
+    # Test GET without token
+    success, response_data = test_api_endpoint(
+        "GET",
+        "/admin/razorpay-settings",
+        description="GET Razorpay settings without authentication (should return 401)",
+        expected_status=401
+    )
+    
+    if success:
+        print(f"✅ SUCCESS: GET Razorpay settings correctly returns 401 without auth")
+        test_results.append(("GET Razorpay Settings Unauthorized", True))
+    else:
+        print(f"❌ FAILED: GET Razorpay settings should return 401 without auth")
+        test_results.append(("GET Razorpay Settings Unauthorized", False))
+    
+    # Test PUT without token
+    success, response_data = test_api_endpoint(
+        "PUT",
+        "/admin/razorpay-settings",
+        data={"key_id": "test", "key_secret": "test"},
+        description="PUT Razorpay settings without authentication (should return 401)",
+        expected_status=401
+    )
+    
+    if success:
+        print(f"✅ SUCCESS: PUT Razorpay settings correctly returns 401 without auth")
+        test_results.append(("PUT Razorpay Settings Unauthorized", True))
+    else:
+        print(f"❌ FAILED: PUT Razorpay settings should return 401 without auth")
+        test_results.append(("PUT Razorpay Settings Unauthorized", False))
+    
+    return test_results
 
 def test_city_suggestions_api(admin_token):
     """Test GET /api/admin/city-suggestions API"""
