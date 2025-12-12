@@ -588,7 +588,11 @@ _📸 Click on image links above to view each product_`;
             const detectedPincode = addr.postcode || '';
             const detectedState = addr.state || '';
             
-            // Smart city detection - IMPROVED ALGORITHM (same as homepage)
+            // Smart city detection - ENHANCED ALGORITHM with state filtering
+            // Get detected state to narrow down city search
+            const detectedState = addr.state;
+            console.log('🌍 Detected State:', detectedState);
+            
             // Try to match with our delivery locations - prioritize exact matches
             const possibleCities = [
               addr.city,
@@ -597,33 +601,44 @@ _📸 Click on image links above to view each product_`;
               addr.county,
               addr.district,
               addr.city_district,
-              addr.village
+              addr.village,
+              addr.suburb
             ].filter(Boolean);
             
             console.log('🏙️ Possible cities from API:', possibleCities);
-            console.log('📍 Our delivery cities:', deliveryLocations.map(l => l.name));
+            console.log('📍 Our delivery cities:', deliveryLocations.map(l => `${l.name}, ${l.state}`));
             
             let detectedCity = '';
             let matchedLocation = null;
             
-            // First try exact match
+            // Filter cities by state first if we have state info
+            let relevantLocations = deliveryLocations;
+            if (detectedState) {
+              relevantLocations = deliveryLocations.filter(loc => 
+                loc.state.toLowerCase().includes(detectedState.toLowerCase()) ||
+                detectedState.toLowerCase().includes(loc.state.toLowerCase())
+              );
+              console.log('🗺️ Filtered to', relevantLocations.length, 'cities in', detectedState);
+            }
+            
+            // First try exact match (case-insensitive)
             for (const possibleCity of possibleCities) {
-              const exactMatch = deliveryLocations.find(
+              const exactMatch = relevantLocations.find(
                 loc => loc.name.toLowerCase() === possibleCity.toLowerCase()
               );
               
               if (exactMatch) {
                 detectedCity = exactMatch.name;
                 matchedLocation = exactMatch;
-                console.log('✅ Exact match found:', detectedCity);
+                console.log('✅ Exact match found:', detectedCity, ',', exactMatch.state);
                 break;
               }
             }
             
-            // If no exact match, try partial match
+            // If no exact match, try partial match within the state
             if (!detectedCity) {
               for (const possibleCity of possibleCities) {
-                const partialMatch = deliveryLocations.find(
+                const partialMatch = relevantLocations.find(
                   loc => 
                     loc.name.toLowerCase().includes(possibleCity.toLowerCase()) ||
                     possibleCity.toLowerCase().includes(loc.name.toLowerCase())
@@ -632,9 +647,31 @@ _📸 Click on image links above to view each product_`;
                 if (partialMatch) {
                   detectedCity = partialMatch.name;
                   matchedLocation = partialMatch;
-                  console.log('✅ Partial match found:', detectedCity);
+                  console.log('✅ Partial match found:', detectedCity, ',', partialMatch.state);
                   break;
                 }
+              }
+            }
+            
+            // If still no match, try finding nearest major city in the detected state
+            if (!detectedCity && detectedState && relevantLocations.length > 0) {
+              // Use the first major city in the state as fallback
+              const majorCities = relevantLocations.filter(loc => 
+                ['Visakhapatnam', 'Vijayawada', 'Guntur', 'Hyderabad', 'Warangal', 'Nizamabad'].includes(loc.name)
+              );
+              
+              if (majorCities.length > 0) {
+                detectedCity = majorCities[0].name;
+                matchedLocation = majorCities[0];
+                console.log('📍 Using nearby major city:', detectedCity);
+                
+                // Show message that we're using nearby city
+                toast({
+                  title: "📍 Nearby City Selected",
+                  description: `We couldn't find your exact location in our delivery areas. Using nearby ${detectedCity} instead. You can change it if needed.`,
+                  variant: "default",
+                  duration: 7000,
+                });
               }
             }
             
