@@ -155,19 +155,26 @@ const Home = () => {
             }
           }
           
-          if (matchedCity) {
-            const matchedLocation = deliveryLocations.find(loc => loc.name === matchedCity);
+          if (matchedCity && matchedLocation) {
             setAutoDetectedCity(matchedCity);
             setSelectedCity(matchedCity);
-            if (matchedLocation) {
-              setSelectedState(matchedLocation.state);
-            }
+            setSelectedState(matchedLocation.state);
+            
             // Show custom notification instead of alert
-            showLocationNotification(`Location detected! Now showing products for ${matchedCity}`, 'success', matchedCity);
+            showLocationNotification(
+              `Location detected! Now showing products available in ${matchedCity}, ${matchedLocation.state}`, 
+              'success', 
+              `${matchedCity}, ${matchedLocation.state}`
+            );
           } else {
             const nearestCity = possibleCities[0] || 'your area';
+            const detectedArea = detectedState ? `${nearestCity} (${detectedState})` : nearestCity;
             // Show custom notification for areas not in delivery
-            showLocationNotification(`Detected ${nearestCity}, but we don't deliver there yet. Showing all products.`, 'warning', nearestCity);
+            showLocationNotification(
+              `Detected ${detectedArea}, but we don't deliver there yet. Please select your city manually.`, 
+              'warning', 
+              detectedArea
+            );
           }
         } catch (error) {
           console.error('Location detection error:', error);
