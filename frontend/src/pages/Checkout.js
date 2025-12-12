@@ -25,6 +25,7 @@ function Checkout() {
   const [customerWhatsApp, setCustomerWhatsApp] = useState(
     user?.phone ? (user.phone.startsWith('+91') ? user.phone : '+91' + user.phone.replace(/[^0-9]/g, '')) : '+91'
   );
+  const [useSameForWhatsApp, setUseSameForWhatsApp] = useState(true);
   
   // Structured address fields
   const [doorNo, setDoorNo] = useState('');
@@ -1075,17 +1076,22 @@ _Order placed via Anantha Home Foods website_`;
 
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-                    Phone Number *
+                    Phone Number * <span className="text-gray-500">(Primary Contact)</span>
                   </label>
                   <div className="relative">
                     <Phone className="absolute left-2 sm:left-3 top-2.5 sm:top-3 h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
-                    <span className="absolute left-8 sm:left-10 text-gray-700 font-medium text-sm sm:text-base pointer-events-none">+91</span>
+                    <span className="absolute left-8 sm:left-10 top-2.5 sm:top-3 text-gray-700 font-medium text-sm sm:text-base pointer-events-none">+91</span>
                     <input
                       type="tel"
                       value={customerPhone.startsWith('+91') ? customerPhone.slice(3) : customerPhone}
                       onChange={(e) => {
                         const value = e.target.value.replace(/[^0-9]/g, '');
-                        setCustomerPhone('+91' + value);
+                        const newPhone = '+91' + value;
+                        setCustomerPhone(newPhone);
+                        // Auto-sync with WhatsApp if checkbox is checked
+                        if (useSameForWhatsApp) {
+                          setCustomerWhatsApp(newPhone);
+                        }
                       }}
                       placeholder="9876543210"
                       maxLength="10"
@@ -1093,16 +1099,36 @@ _Order placed via Anantha Home Foods website_`;
                       required
                     />
                   </div>
+                  
+                  {/* Checkbox to use same number for WhatsApp */}
+                  <div className="mt-2 sm:mt-3 flex items-start space-x-2">
+                    <input
+                      type="checkbox"
+                      id="sameWhatsApp"
+                      checked={useSameForWhatsApp}
+                      onChange={(e) => {
+                        setUseSameForWhatsApp(e.target.checked);
+                        if (e.target.checked) {
+                          setCustomerWhatsApp(customerPhone);
+                        }
+                      }}
+                      className="mt-0.5 h-4 w-4 text-green-500 border-gray-300 rounded focus:ring-green-500"
+                    />
+                    <label htmlFor="sameWhatsApp" className="text-xs sm:text-sm text-gray-700 cursor-pointer">
+                      Use same number for WhatsApp (order updates will be sent here)
+                    </label>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-                    WhatsApp Number *
-                  </label>
-                  <div className="relative">
-                    <Phone className="absolute left-2 sm:left-3 top-2.5 sm:top-3 h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
-                    <div className="flex items-center">
-                      <span className="absolute left-8 sm:left-10 text-gray-700 font-medium text-sm sm:text-base pointer-events-none">+91</span>
+                {/* Show separate WhatsApp field only if user unchecks the checkbox */}
+                {!useSameForWhatsApp && (
+                  <div>
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                      WhatsApp Number *
+                    </label>
+                    <div className="relative">
+                      <Phone className="absolute left-2 sm:left-3 top-2.5 sm:top-3 h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
+                      <span className="absolute left-8 sm:left-10 top-2.5 sm:top-3 text-gray-700 font-medium text-sm sm:text-base pointer-events-none">+91</span>
                       <input
                         type="tel"
                         value={customerWhatsApp.startsWith('+91') ? customerWhatsApp.slice(3) : customerWhatsApp}
@@ -1116,9 +1142,9 @@ _Order placed via Anantha Home Foods website_`;
                         required
                       />
                     </div>
+                    <p className="text-xs text-gray-500 mt-1">Order details will be sent to this WhatsApp number</p>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">Order details will be sent to this WhatsApp number</p>
-                </div>
+                )}
               </div>
             </div>
 
