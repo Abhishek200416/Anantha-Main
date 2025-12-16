@@ -3095,6 +3095,143 @@ async def get_public_whatsapp_numbers():
         logger.error(f"Error fetching public WhatsApp numbers: {str(e)}")
         return []
 
+# ============= SOCIAL MEDIA SHARING ENDPOINT =============
+
+def is_social_crawler(user_agent: str) -> bool:
+    """Detect if the request is from a social media crawler"""
+    if not user_agent:
+        return False
+    
+    user_agent_lower = user_agent.lower()
+    
+    # List of social media crawler user agents
+    crawlers = [
+        'whatsapp',
+        'facebookexternalhit',
+        'facebot',
+        'twitterbot',
+        'telegrambot',
+        'linkedinbot',
+        'slackbot',
+        'discordbot',
+        'pinterest',
+        'redditbot',
+        'skypeuripreview',
+        'vkshare',
+        'w3c_validator',
+        'baiduspider',
+        'yandexbot'
+    ]
+    
+    return any(crawler in user_agent_lower for crawler in crawlers)
+
+@app.get("/product/{product_id}", response_class=HTMLResponse)
+async def product_page_with_meta(product_id: str, request: Request):
+    """
+    Serve product page with Open Graph meta tags for social media sharing.
+    Detects social media crawlers and returns HTML with proper meta tags.
+    For regular browsers, this will be caught by the React router.
+    """
+    # Get user agent
+    user_agent = request.headers.get('user-agent', '')
+    
+    # Check if this is a social media crawler
+    if is_social_crawler(user_agent):
+        logger.info(f"Social crawler detected: {user_agent[:100]}")
+        
+        try:
+            # Fetch product from database
+            product = await db.products.find_one({"id": product_id})
+            
+            if not product:
+                logger.warning(f"Product not found for crawler: {product_id}")
+                return HTMLResponse(content="<html><head><title>Product Not Found</title></head><body><h1>Product Not Found</h1></body></html>", status_code=404)
+            
+            # Get product details
+            product_name = product.get('name', 'Product')
+            product_description = product.get('description', 'Authentic homemade food from Anantha Home Foods')
+            product_image = product.get('image', 'https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg')
+            
+            # Get price information
+            prices = product.get('prices', [])
+            price_text = ""
+            if prices:
+                first_price = prices[0]
+                price_text = f"Starting from ₹{first_price.get('price', 0)} for {first_price.get('weight', '')}"
+            
+            # Build absolute URL
+            base_url = os.getenv('REACT_APP_BACKEND_URL', 'https://social-preview-fix-1.preview.emergentagent.com')
+            if base_url.endswith('/api'):
+                base_url = base_url[:-4]
+            product_url = f"{base_url}/product/{product_id}"
+            
+            # Make sure image URL is absolute
+            if product_image and not product_image.startswith('http'):
+                product_image = f"{base_url}{product_image}"
+            
+            # Create HTML with Open Graph meta tags
+            html_content = f"""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{product_name} - Anantha Home Foods</title>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="product" />
+    <meta property="og:url" content="{product_url}" />
+    <meta property="og:title" content="{product_name} - Anantha Home Foods" />
+    <meta property="og:description" content="{product_description}" />
+    <meta property="og:image" content="{product_image}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="Anantha Home Foods" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="{product_url}" />
+    <meta name="twitter:title" content="{product_name} - Anantha Home Foods" />
+    <meta name="twitter:description" content="{product_description}" />
+    <meta name="twitter:image" content="{product_image}" />
+    
+    <!-- WhatsApp specific -->
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:alt" content="{product_name}" />
+    
+    <!-- Product specific meta -->
+    <meta property="product:price:amount" content="{prices[0].get('price', 0) if prices else 0}" />
+    <meta property="product:price:currency" content="INR" />
+    
+    <meta http-equiv="refresh" content="0; url={product_url}" />
+</head>
+<body style="font-family: Arial, sans-serif; padding: 20px; text-align: center;">
+    <div style="max-width: 600px; margin: 0 auto;">
+        <img src="{product_image}" alt="{product_name}" style="max-width: 100%; height: auto; border-radius: 10px; margin-bottom: 20px;" />
+        <h1 style="color: #ea580c;">{product_name}</h1>
+        <p style="color: #666; font-size: 16px;">{product_description}</p>
+        <p style="color: #333; font-size: 18px; font-weight: bold;">{price_text}</p>
+        <p style="margin-top: 30px;">
+            <a href="{product_url}" style="background: linear-gradient(to right, #ea580c, #dc2626); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block;">View Product Details</a>
+        </p>
+        <p style="color: #999; font-size: 14px; margin-top: 20px;">Redirecting to product page...</p>
+    </div>
+</body>
+</html>
+"""
+            
+            logger.info(f"Serving meta tags for product {product_id} to crawler")
+            return HTMLResponse(content=html_content)
+            
+        except Exception as e:
+            logger.error(f"Error serving product page to crawler: {str(e)}")
+            return HTMLResponse(content=f"<html><head><title>Error</title></head><body><h1>Error loading product</h1><p>{str(e)}</p></body></html>", status_code=500)
+    
+    # For regular browsers, let React handle it
+    # This will fall through to the React app's routing
+    logger.info(f"Regular browser request for product {product_id}, letting React handle it")
+    raise HTTPException(status_code=404, detail="Not found - React will handle")
+
 # Include router
 app.include_router(api_router)
 
