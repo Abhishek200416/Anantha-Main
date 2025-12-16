@@ -7,14 +7,25 @@ import os
 import sys
 from pymongo import MongoClient
 from cities_data import ANDHRA_PRADESH_CITIES, TELANGANA_CITIES, DEFAULT_DELIVERY_CHARGES
+from dotenv import load_dotenv
+from pathlib import Path
+
+# Load environment variables
+ROOT_DIR = Path(__file__).parent
+load_dotenv(ROOT_DIR / '.env')
 
 def seed_all_cities():
     """Seed all cities from cities_data.py into database"""
     
-    # Connect to MongoDB
+    # Connect to MongoDB using environment variables
     mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017/')
+    db_name = os.environ.get('DB_NAME', 'anantha_lakshmi_db')
+    
+    print(f"🔗 Connecting to MongoDB: {mongo_url}")
+    print(f"📦 Using database: {db_name}")
+    
     client = MongoClient(mongo_url)
-    db = client['food_delivery']
+    db = client[db_name]
     locations_collection = db.locations
     
     print("=" * 60)
