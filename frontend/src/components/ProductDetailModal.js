@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShoppingCart, Star, Sparkles, TrendingUp, Percent } from 'lucide-react';
+import { X, ShoppingCart, Star, Sparkles, TrendingUp, Percent, Share2 } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { toast } from '../hooks/use-toast';
