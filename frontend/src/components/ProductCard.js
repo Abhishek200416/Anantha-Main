@@ -42,6 +42,9 @@ const ProductCard = ({ product }) => {
       ? `\n🎉 ${product.discount_percentage}% OFF!` 
       : '';
     
+    // Generate product-specific URL
+    const productUrl = `${window.location.origin}/product/${product.id}`;
+    
     const shareText = `🛍️ *${productName}*
 
 ${productDescription}
@@ -51,7 +54,7 @@ ${productDescription}
 ${product.isBestSeller ? '⭐ Best Seller\n' : ''}${product.isNew ? '✨ New Product\n' : ''}
 🌐 Order now from Anantha Home Foods!
 
-🔗 Product Image: ${product.image}
+🔗 View Product: ${productUrl}
 
 📱 WhatsApp: https://wa.me/919985116385`;
 
@@ -61,7 +64,7 @@ ${product.isBestSeller ? '⭐ Best Seller\n' : ''}${product.isNew ? '✨ New Pro
         await navigator.share({
           title: productName,
           text: shareText,
-          url: window.location.href
+          url: productUrl
         });
         toast({
           title: "✅ Shared successfully!",
