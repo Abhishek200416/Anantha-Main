@@ -640,6 +640,56 @@ async def get_products(city: Optional[str] = None, state: Optional[str] = None):
     
     return products
 
+@api_router.get("/products/{product_id}")
+async def get_product(product_id: str):
+    """Get a single product by ID with discount calculation"""
+    product = await db.products.find_one({"id": product_id}, {"_id": 0})
+    
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    # Calculate discounted prices for the product
+    discount_percentage = product.get('discount_percentage')
+    discount_expiry = product.get('discount_expiry_date')
+    
+    # Check if discount is valid
+    discount_active = False
+    if discount_percentage and discount_expiry:
+        try:
+            # Parse the date string
+            expiry_date_str = discount_expiry.replace('Z', '+00:00')
+            if 'T' in expiry_date_str:
+                expiry_date = datetime.fromisoformat(expiry_date_str)
+            else:
+                # If only date is provided (YYYY-MM-DD), add time and timezone
+                expiry_date = datetime.fromisoformat(expiry_date_str + "T23:59:59+00:00")
+            
+            # Ensure timezone awareness for comparison
+            if expiry_date.tzinfo is None:
+                expiry_date = expiry_date.replace(tzinfo=timezone.utc)
+            
+            if expiry_date > datetime.now(timezone.utc):
+                discount_active = True
+        except:
+            pass
+    
+    product['discount_active'] = discount_active
+    
+    # Calculate discounted prices if discount is active
+    if discount_active and discount_percentage:
+        discounted_prices = []
+        for price_item in product.get('prices', []):
+            original_price = price_item['price']
+            discounted_price = round(original_price * (1 - discount_percentage / 100), 2)
+            discounted_prices.append({
+                **price_item,
+                'original_price': original_price,
+                'discounted_price': discounted_price
+            })
+        product['discounted_prices'] = discounted_prices
+    
+    return product
+
 @api_router.post("/products")
 async def create_product(product: Product, current_user: dict = Depends(get_current_user)):
     """Create new product (Admin only)"""
