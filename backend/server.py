@@ -2992,26 +2992,18 @@ async def update_payment_settings(
 
 @api_router.get("/admin/razorpay-settings")
 async def get_razorpay_settings(current_user: dict = Depends(get_current_user)):
-    """Get Razorpay API keys (Admin only)"""
+    """Get Razorpay API keys from .env file (Admin only)"""
     try:
         if not current_user.get("is_admin"):
             raise HTTPException(status_code=403, detail="Admin access required")
         
-        settings = await db.razorpay_settings.find_one({}, {"_id": 0})
-        
-        if not settings:
-            # Return current env vars as default
-            return {
-                "key_id": os.environ.get('RAZORPAY_KEY_ID', ''),
-                "key_secret": os.environ.get('RAZORPAY_KEY_SECRET', ''),
-                "updated_at": None
-            }
-        
-        # Convert datetime to ISO string
-        if isinstance(settings.get("updated_at"), datetime):
-            settings["updated_at"] = settings["updated_at"].isoformat()
-        
-        return settings
+        # Always return keys from environment variables (.env file)
+        return {
+            "key_id": os.environ.get('RAZORPAY_KEY_ID', ''),
+            "key_secret": os.environ.get('RAZORPAY_KEY_SECRET', ''),
+            "source": ".env file",
+            "updated_at": None
+        }
     except HTTPException:
         raise
     except Exception as e:
