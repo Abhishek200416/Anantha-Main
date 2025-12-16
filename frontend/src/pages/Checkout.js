@@ -283,10 +283,12 @@ function Checkout() {
     // Create professionally formatted WhatsApp message
     // Build items list with proper formatting
     const itemsList = orderData.items.map((item, idx) => {
+      // Create product link instead of showing image path
+      const productLink = `${window.location.origin}/product/${item.product_id}`;
       return `${idx + 1}. *${item.name}*
    Weight: ${item.weight}
    Price: Rs.${item.price} x ${item.quantity} = Rs.${item.price * item.quantity}
-   Product Image: ${item.image || 'No image'}`;
+   Product Link: ${productLink}`;
     }).join('\n\n');
 
     const message = `*NEW ORDER RECEIVED*
