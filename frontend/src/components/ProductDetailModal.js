@@ -30,6 +30,62 @@ const ProductDetailModal = ({ product, onClose }) => {
     });
   };
 
+  const handleShare = async () => {
+    const discountedPrice = getDiscountedPrice(selectedPriceIndex);
+    const finalPrice = discountedPrice || selectedPrice.price;
+    const discountText = product.discount_active && product.discount_percentage 
+      ? `\n🎉 ${product.discount_percentage}% OFF - Save ₹${Math.round(selectedPrice.price - discountedPrice)}!` 
+      : '';
+    
+    const shareText = `🛍️ *${productName}*
+
+${productDescription}
+
+💰 Price: ₹${finalPrice}${discountedPrice ? ` (was ₹${selectedPrice.price})` : ''} for ${selectedPrice.weight}${discountText}
+
+${product.isBestSeller ? '⭐ Best Seller\n' : ''}${product.isNew ? '✨ New Product\n' : ''}🏷️ Category: ${product.category.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+
+🌐 Order now from Anantha Home Foods!
+
+🔗 Product Image: ${product.image}
+
+📱 Contact us: https://wa.me/919985116385`;
+
+    // Check if Web Share API is supported
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: productName,
+          text: shareText,
+          url: window.location.href
+        });
+        toast({
+          title: "✅ Shared successfully!",
+          description: "Product shared via your selected app.",
+        });
+      } catch (error) {
+        // User cancelled or error occurred
+        if (error.name !== 'AbortError') {
+          // Fallback to WhatsApp if share fails
+          shareViaWhatsApp(shareText);
+        }
+      }
+    } else {
+      // Fallback to WhatsApp for desktop browsers
+      shareViaWhatsApp(shareText);
+    }
+  };
+
+  const shareViaWhatsApp = (text) => {
+    const encodedText = encodeURIComponent(text);
+    const whatsappUrl = `https://wa.me/?text=${encodedText}`;
+    window.open(whatsappUrl, '_blank');
+    toast({
+      title: "📱 Opening WhatsApp",
+      description: "Share this product with your friends!",
+    });
+  };
+
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in" onClick={onClose}>
       <div 
