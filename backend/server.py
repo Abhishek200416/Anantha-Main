@@ -3346,7 +3346,7 @@ async def share_product_with_meta(product_id: str, request: Request):
     <div class="container">
         <div class="image-container">
             <img src="{product_image}" alt="{product_name}" class="product-image" />
-            {f'<div class="badges">{" ".join([f\'<div class="badge">{badge}</div>\' for badge in badges])}</div>' if badges else ''}
+            {badges_html}
         </div>
         <div class="content">
             <h1>{product_name}</h1>
