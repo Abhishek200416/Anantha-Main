@@ -37,6 +37,7 @@ function App() {
                 <CartSidebar />
                 <Routes>
                   <Route path="/" element={<Home />} />
+                  <Route path="/product/:productId" element={<ProductDetail />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/checkout" element={<Checkout />} />
