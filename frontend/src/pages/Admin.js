@@ -1655,65 +1655,6 @@ const Admin = () => {
     }
   };
 
-  // Fetch Razorpay API Keys
-  const fetchRazorpayKeys = async () => {
-    setRazorpayKeysLoading(true);
-    try {
-      const response = await axios.get(`${BACKEND_URL}/api/admin/razorpay-settings`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
-      setRazorpayKeyId(response.data.key_id || '');
-      setRazorpayKeySecret(response.data.key_secret || '');
-    } catch (error) {
-      console.error('Failed to fetch Razorpay keys:', error);
-      toast({
-        title: "Error",
-        description: formatErrorMessage(error) || "Failed to load Razorpay settings",
-        variant: "destructive"
-      });
-    } finally {
-      setRazorpayKeysLoading(false);
-    }
-  };
-
-  // Update Razorpay API Keys
-  const handleSaveRazorpayKeys = async () => {
-    if (!razorpayKeyId || !razorpayKeySecret) {
-      toast({
-        title: "Validation Error",
-        description: "Both Key ID and Key Secret are required",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setRazorpayKeysLoading(true);
-    try {
-      await axios.put(
-        `${BACKEND_URL}/api/admin/razorpay-settings?key_id=${encodeURIComponent(razorpayKeyId)}&key_secret=${encodeURIComponent(razorpayKeySecret)}`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        }
-      );
-      setRazorpayKeysSaved(true);
-      setTimeout(() => setRazorpayKeysSaved(false), 3000);
-      toast({
-        title: "Success",
-        description: "Razorpay API keys updated successfully in .env file. Changes are now active.",
-      });
-    } catch (error) {
-      console.error('Failed to update Razorpay keys:', error);
-      toast({
-        title: "Error",
-        description: formatErrorMessage(error) || "Failed to update Razorpay keys",
-        variant: "destructive"
-      });
-    } finally {
-      setRazorpayKeysLoading(false);
-    }
-  };
-
   // Fetch WhatsApp numbers
   const fetchWhatsAppNumbers = async () => {
     try {
