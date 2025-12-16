@@ -231,23 +231,34 @@ ${product.isBestSeller ? '⭐ Best Seller\n' : ''}${product.isNew ? '✨ New Pro
               </div>
             </div>
 
-            {/* Add to Cart Button */}
-            <button
-              onClick={() => {
-                if (!product.out_of_stock) {
-                  handleAddToCart();
-                }
-              }}
-              disabled={product.out_of_stock}
-              className={`w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center space-x-2 shadow-lg ${
-                product.out_of_stock
-                  ? 'bg-gray-400 cursor-not-allowed text-white'
-                  : 'bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 transform hover:scale-105'
-              }`}
-            >
-              <ShoppingCart className="h-6 w-6" />
-              <span>{product.out_of_stock ? 'Out of Stock' : 'Add to Cart'}</span>
-            </button>
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  if (!product.out_of_stock) {
+                    handleAddToCart();
+                  }
+                }}
+                disabled={product.out_of_stock}
+                className={`flex-1 py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center space-x-2 shadow-lg ${
+                  product.out_of_stock
+                    ? 'bg-gray-400 cursor-not-allowed text-white'
+                    : 'bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 transform hover:scale-105'
+                }`}
+              >
+                <ShoppingCart className="h-6 w-6" />
+                <span>{product.out_of_stock ? 'Out of Stock' : 'Add to Cart'}</span>
+              </button>
+              
+              <button
+                onClick={handleShare}
+                className="py-4 px-6 rounded-xl font-semibold text-lg transition-all flex items-center justify-center space-x-2 shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transform hover:scale-105"
+                title="Share this product"
+              >
+                <Share2 className="h-6 w-6" />
+                <span>Share</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
