@@ -1706,7 +1706,7 @@ const Admin = () => {
       setTimeout(() => setRazorpayKeysSaved(false), 3000);
       toast({
         title: "Success",
-        description: "Razorpay API keys updated successfully. Changes will take effect immediately.",
+        description: "Razorpay API keys updated successfully in .env file. Changes are now active.",
       });
     } catch (error) {
       console.error('Failed to update Razorpay keys:', error);
