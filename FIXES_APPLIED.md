@@ -202,7 +202,7 @@ const majorCities = relevantLocations.filter(loc =>
 - ✅ Frontend recompiled successfully
 - ✅ Backend running (no changes needed)
 - ✅ Database populated (58 products, 431 cities)
-- ✅ Application URL: https://city-order-bug.preview.emergentagent.com
+- ✅ Application URL: https://easy-whatsapp-send.preview.emergentagent.com
 
 ---
 

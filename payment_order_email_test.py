@@ -20,7 +20,7 @@ import random
 import subprocess
 
 # Backend URL from environment
-BACKEND_URL = "https://city-order-bug.preview.emergentagent.com/api"
+BACKEND_URL = "https://easy-whatsapp-send.preview.emergentagent.com/api"
 ADMIN_PASSWORD = "admin123"
 
 def test_api_endpoint(method, endpoint, headers=None, data=None, description="", expected_status=None):
