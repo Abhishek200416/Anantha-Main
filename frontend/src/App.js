@@ -23,6 +23,7 @@ import OrderSuccess from './pages/OrderSuccess';
 import TrackOrder from './pages/TrackOrder';
 import Admin from './pages/Admin';
 import ReportBug from './pages/ReportBug';
+import ProductDetail from './pages/ProductDetail';
 
 function App() {
   return (
