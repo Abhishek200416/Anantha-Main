@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShoppingCart, ArrowLeft, Share2, Star, Sparkles, TrendingUp, Percent } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, Share2, Copy, Star, Sparkles, TrendingUp, Percent } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { toast } from '../hooks/use-toast';
