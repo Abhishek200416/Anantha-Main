@@ -3016,7 +3016,7 @@ async def update_razorpay_settings(
     key_secret: str,
     current_user: dict = Depends(get_current_user)
 ):
-    """Update Razorpay API keys (Admin only)"""
+    """Update Razorpay API keys in .env file (Admin only)"""
     try:
         if not current_user.get("is_admin"):
             raise HTTPException(status_code=403, detail="Admin access required")
@@ -3025,14 +3025,36 @@ async def update_razorpay_settings(
         if not key_id or not key_secret:
             raise HTTPException(status_code=400, detail="Both Key ID and Key Secret are required")
         
-        # Update or create settings
-        settings = RazorpaySettings(key_id=key_id, key_secret=key_secret)
+        # Update .env file
+        env_file_path = os.path.join(os.path.dirname(__file__), '.env')
         
-        await db.razorpay_settings.update_one(
-            {},
-            {"$set": settings.model_dump()},
-            upsert=True
-        )
+        # Read current .env file
+        env_lines = []
+        if os.path.exists(env_file_path):
+            with open(env_file_path, 'r') as f:
+                env_lines = f.readlines()
+        
+        # Update or add Razorpay keys
+        key_id_updated = False
+        key_secret_updated = False
+        
+        for i, line in enumerate(env_lines):
+            if line.startswith('RAZORPAY_KEY_ID='):
+                env_lines[i] = f'RAZORPAY_KEY_ID="{key_id}"\n'
+                key_id_updated = True
+            elif line.startswith('RAZORPAY_KEY_SECRET='):
+                env_lines[i] = f'RAZORPAY_KEY_SECRET="{key_secret}"\n'
+                key_secret_updated = True
+        
+        # Add keys if they don't exist
+        if not key_id_updated:
+            env_lines.append(f'RAZORPAY_KEY_ID="{key_id}"\n')
+        if not key_secret_updated:
+            env_lines.append(f'RAZORPAY_KEY_SECRET="{key_secret}"\n')
+        
+        # Write back to .env file
+        with open(env_file_path, 'w') as f:
+            f.writelines(env_lines)
         
         # Update environment variables for immediate use
         os.environ['RAZORPAY_KEY_ID'] = key_id
@@ -3042,9 +3064,9 @@ async def update_razorpay_settings(
         global razorpay_client
         razorpay_client = razorpay.Client(auth=(key_id, key_secret))
         
-        logger.info(f"Razorpay settings updated - Key ID: {key_id[:10]}...")
+        logger.info(f"Razorpay settings updated in .env file - Key ID: {key_id[:10]}...")
         
-        return {"message": "Razorpay settings updated successfully", "key_id": key_id}
+        return {"message": "Razorpay settings updated successfully in .env file", "key_id": key_id}
     except HTTPException:
         raise
     except Exception as e:
