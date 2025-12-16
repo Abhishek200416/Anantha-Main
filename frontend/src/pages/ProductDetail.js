@@ -118,6 +118,10 @@ const ProductDetail = () => {
       ? `\n🎉 ${product.discount_percentage}% OFF!` 
       : '';
     
+    // Use the share endpoint URL for better preview on social media
+    const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
+    const shareUrl = `${backendUrl}/api/share/product/${productId}`;
+    
     const shareText = `🛍️ *${productName}*
 
 ${productDescription}
@@ -127,7 +131,7 @@ ${productDescription}
 ${product.isBestSeller ? '⭐ Best Seller\n' : ''}${product.isNew ? '✨ New Product\n' : ''}
 🌐 Order now from Anantha Home Foods!
 
-🔗 ${window.location.href}
+🔗 ${shareUrl}
 
 📱 WhatsApp: https://wa.me/919985116385`;
 
@@ -137,7 +141,7 @@ ${product.isBestSeller ? '⭐ Best Seller\n' : ''}${product.isNew ? '✨ New Pro
         await navigator.share({
           title: productName,
           text: shareText,
-          url: window.location.href
+          url: shareUrl
         });
         toast({
           title: "✅ Shared successfully!",
