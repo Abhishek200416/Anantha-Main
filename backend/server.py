@@ -309,14 +309,7 @@ class OTPVerification(BaseModel):
     expires_at: datetime
 
 # ============= HELPER FUNCTIONS =============
-
-def generate_order_id():
-    """Generate unique order ID"""
-    return f"AL{datetime.now().strftime('%Y%m%d')}{random.randint(1000, 9999)}"
-
-def generate_tracking_code():
-    """Generate tracking code"""
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+# Note: generate_order_id, generate_tracking_code moved to utils/helpers.py
 
 async def get_current_user(authorization: Optional[str] = Header(None)):
     """Dependency to get current user from JWT token"""
