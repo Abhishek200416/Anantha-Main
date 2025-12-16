@@ -330,7 +330,7 @@ Payment Method: ${orderData.payment_method === 'razorpay' ? 'Online Payment (Raz
 Payment Status: ${orderData.payment_status === 'completed' ? 'PAID' : 'Pending'}
 
 _Order placed via Anantha Home Foods_
-_Click product image links above to view products_`;
+_Click product links above to view products_`;
 
     const encodedMessage = encodeURIComponent(message);
 
