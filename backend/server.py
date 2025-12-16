@@ -3179,6 +3179,12 @@ async def share_product_with_meta(product_id: str, request: Request):
             badges.append("✨ New Product")
         badges_text = " | ".join(badges) if badges else ""
         
+        # Create badges HTML
+        badges_html = ""
+        if badges:
+            badge_divs = "".join([f'<div class="badge">{badge}</div>' for badge in badges])
+            badges_html = f'<div class="badges">{badge_divs}</div>'
+        
         # Create meta description with badges
         meta_description = f"{product_description}"
         if badges_text:
