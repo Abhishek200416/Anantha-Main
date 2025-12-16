@@ -3,7 +3,7 @@
 Admin Payment Endpoints Testing Script
 Testing all payment-related endpoints in the admin panel as specified in review request
 
-**Backend URL:** https://env-config-tool.preview.emergentagent.com/api
+**Backend URL:** https://city-order-bug.preview.emergentagent.com/api
 
 **Admin Credentials:**
 - Email: admin@ananthalakshmi.com
@@ -23,7 +23,7 @@ import sys
 from datetime import datetime
 
 # Backend URL from environment
-BACKEND_URL = "https://env-config-tool.preview.emergentagent.com/api"
+BACKEND_URL = "https://city-order-bug.preview.emergentagent.com/api"
 
 def test_api_endpoint(method, endpoint, headers=None, data=None, params=None, description="", expected_status=None):
     """Test a single API endpoint"""
