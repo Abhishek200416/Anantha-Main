@@ -9,7 +9,7 @@ import json
 import time
 from datetime import datetime
 
-BACKEND_URL = "https://social-preview-fix-1.preview.emergentagent.com/api"
+BACKEND_URL = "https://codebase-organizer-2.preview.emergentagent.com/api"
 
 def admin_login():
     """Login as admin and get auth token"""
