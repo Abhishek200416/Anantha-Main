@@ -3125,112 +3125,245 @@ def is_social_crawler(user_agent: str) -> bool:
     
     return any(crawler in user_agent_lower for crawler in crawlers)
 
-@app.get("/product/{product_id}", response_class=HTMLResponse)
-async def product_page_with_meta(product_id: str, request: Request):
+@api_router.get("/share/product/{product_id}", response_class=HTMLResponse)
+async def share_product_with_meta(product_id: str, request: Request):
     """
-    Serve product page with Open Graph meta tags for social media sharing.
-    Detects social media crawlers and returns HTML with proper meta tags.
-    For regular browsers, this will be caught by the React router.
+    Serve product share page with Open Graph meta tags for social media sharing.
+    This endpoint is specifically for sharing on WhatsApp, Facebook, Twitter, etc.
+    It returns HTML with proper meta tags that social media crawlers can read.
     """
-    # Get user agent
-    user_agent = request.headers.get('user-agent', '')
-    
-    # Check if this is a social media crawler
-    if is_social_crawler(user_agent):
-        logger.info(f"Social crawler detected: {user_agent[:100]}")
+    try:
+        # Fetch product from database
+        product = await db.products.find_one({"id": product_id})
         
-        try:
-            # Fetch product from database
-            product = await db.products.find_one({"id": product_id})
-            
-            if not product:
-                logger.warning(f"Product not found for crawler: {product_id}")
-                return HTMLResponse(content="<html><head><title>Product Not Found</title></head><body><h1>Product Not Found</h1></body></html>", status_code=404)
-            
-            # Get product details
-            product_name = product.get('name', 'Product')
-            product_description = product.get('description', 'Authentic homemade food from Anantha Home Foods')
-            product_image = product.get('image', 'https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg')
-            
-            # Get price information
-            prices = product.get('prices', [])
-            price_text = ""
-            if prices:
-                first_price = prices[0]
-                price_text = f"Starting from ₹{first_price.get('price', 0)} for {first_price.get('weight', '')}"
-            
-            # Build absolute URL
-            base_url = os.getenv('REACT_APP_BACKEND_URL', 'https://social-preview-fix-1.preview.emergentagent.com')
-            if base_url.endswith('/api'):
-                base_url = base_url[:-4]
-            product_url = f"{base_url}/product/{product_id}"
-            
-            # Make sure image URL is absolute
-            if product_image and not product_image.startswith('http'):
-                product_image = f"{base_url}{product_image}"
-            
-            # Create HTML with Open Graph meta tags
-            html_content = f"""
-<!DOCTYPE html>
+        if not product:
+            logger.warning(f"Product not found for sharing: {product_id}")
+            return HTMLResponse(
+                content="<html><head><title>Product Not Found</title></head><body><h1>Product Not Found</h1></body></html>",
+                status_code=404
+            )
+        
+        # Get product details
+        product_name = product.get('name', 'Product')
+        product_name_telugu = product.get('name_telugu', '')
+        product_description = product.get('description', 'Authentic homemade food from Anantha Home Foods')
+        product_description_telugu = product.get('description_telugu', '')
+        product_image = product.get('image', 'https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg')
+        category = product.get('category', 'food')
+        is_best_seller = product.get('isBestSeller', False)
+        is_new = product.get('isNew', False)
+        
+        # Get price information
+        prices = product.get('prices', [])
+        price_text = ""
+        if prices:
+            first_price = prices[0]
+            price_text = f"Starting from ₹{first_price.get('price', 0)} for {first_price.get('weight', '')}"
+        
+        # Build absolute URLs
+        base_url = os.getenv('REACT_APP_BACKEND_URL', 'https://social-preview-fix-1.preview.emergentagent.com')
+        if base_url.endswith('/api'):
+            base_url = base_url[:-4]
+        product_url = f"{base_url}/product/{product_id}"
+        share_url = f"{base_url}/api/share/product/{product_id}"
+        
+        # Make sure image URL is absolute
+        if product_image and not product_image.startswith('http'):
+            product_image = f"{base_url}{product_image}"
+        
+        # Add badges text
+        badges = []
+        if is_best_seller:
+            badges.append("⭐ Best Seller")
+        if is_new:
+            badges.append("✨ New Product")
+        badges_text = " | ".join(badges) if badges else ""
+        
+        # Create meta description with badges
+        meta_description = f"{product_description}"
+        if badges_text:
+            meta_description = f"{badges_text} - {product_description}"
+        
+        # Create HTML with Open Graph meta tags
+        html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{product_name} - Anantha Home Foods</title>
+    <meta name="description" content="{meta_description}" />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="product" />
-    <meta property="og:url" content="{product_url}" />
+    <meta property="og:url" content="{share_url}" />
     <meta property="og:title" content="{product_name} - Anantha Home Foods" />
-    <meta property="og:description" content="{product_description}" />
+    <meta property="og:description" content="{meta_description}" />
     <meta property="og:image" content="{product_image}" />
+    <meta property="og:image:secure_url" content="{product_image}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:alt" content="{product_name}" />
     <meta property="og:site_name" content="Anantha Home Foods" />
+    <meta property="og:locale" content="en_US" />
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="{product_url}" />
+    <meta name="twitter:url" content="{share_url}" />
     <meta name="twitter:title" content="{product_name} - Anantha Home Foods" />
-    <meta name="twitter:description" content="{product_description}" />
+    <meta name="twitter:description" content="{meta_description}" />
     <meta name="twitter:image" content="{product_image}" />
+    <meta name="twitter:image:alt" content="{product_name}" />
     
     <!-- WhatsApp specific -->
     <meta property="og:image:type" content="image/jpeg" />
-    <meta property="og:image:alt" content="{product_name}" />
     
     <!-- Product specific meta -->
     <meta property="product:price:amount" content="{prices[0].get('price', 0) if prices else 0}" />
     <meta property="product:price:currency" content="INR" />
+    <meta property="product:category" content="{category}" />
     
-    <meta http-equiv="refresh" content="0; url={product_url}" />
+    <!-- Redirect to actual product page after 2 seconds -->
+    <meta http-equiv="refresh" content="2; url={product_url}" />
+    
+    <style>
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fff5f0 0%, #ffe5e5 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }}
+        .container {{
+            max-width: 600px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-in;
+        }}
+        @keyframes fadeIn {{
+            from {{ opacity: 0; transform: translateY(20px); }}
+            to {{ opacity: 1; transform: translateY(0); }}
+        }}
+        .image-container {{
+            position: relative;
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+        }}
+        .product-image {{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }}
+        .badges {{
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }}
+        .badge {{
+            background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+        }}
+        .content {{
+            padding: 30px;
+            text-align: center;
+        }}
+        h1 {{
+            color: #ea580c;
+            font-size: 32px;
+            margin: 0 0 15px 0;
+            font-weight: 700;
+        }}
+        .description {{
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 0 0 20px 0;
+        }}
+        .price {{
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+        }}
+        .button {{
+            display: inline-block;
+            background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+            color: white;
+            padding: 15px 40px;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }}
+        .button:hover {{
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(234, 88, 12, 0.4);
+        }}
+        .redirect-text {{
+            color: #999;
+            font-size: 14px;
+            margin-top: 25px;
+            font-style: italic;
+        }}
+        .spinner {{
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(234, 88, 12, 0.3);
+            border-radius: 50%;
+            border-top-color: #ea580c;
+            animation: spin 1s ease-in-out infinite;
+        }}
+        @keyframes spin {{
+            to {{ transform: rotate(360deg); }}
+        }}
+    </style>
 </head>
-<body style="font-family: Arial, sans-serif; padding: 20px; text-align: center;">
-    <div style="max-width: 600px; margin: 0 auto;">
-        <img src="{product_image}" alt="{product_name}" style="max-width: 100%; height: auto; border-radius: 10px; margin-bottom: 20px;" />
-        <h1 style="color: #ea580c;">{product_name}</h1>
-        <p style="color: #666; font-size: 16px;">{product_description}</p>
-        <p style="color: #333; font-size: 18px; font-weight: bold;">{price_text}</p>
-        <p style="margin-top: 30px;">
-            <a href="{product_url}" style="background: linear-gradient(to right, #ea580c, #dc2626); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block;">View Product Details</a>
-        </p>
-        <p style="color: #999; font-size: 14px; margin-top: 20px;">Redirecting to product page...</p>
+<body>
+    <div class="container">
+        <div class="image-container">
+            <img src="{product_image}" alt="{product_name}" class="product-image" />
+            {f'<div class="badges">{" ".join([f\'<div class="badge">{badge}</div>\' for badge in badges])}</div>' if badges else ''}
+        </div>
+        <div class="content">
+            <h1>{product_name}</h1>
+            <p class="description">{product_description}</p>
+            <div class="price">{price_text}</div>
+            <a href="{product_url}" class="button">View Product Details</a>
+            <p class="redirect-text">
+                <span class="spinner"></span> Redirecting to product page...
+            </p>
+        </div>
     </div>
 </body>
-</html>
-"""
-            
-            logger.info(f"Serving meta tags for product {product_id} to crawler")
-            return HTMLResponse(content=html_content)
-            
-        except Exception as e:
-            logger.error(f"Error serving product page to crawler: {str(e)}")
-            return HTMLResponse(content=f"<html><head><title>Error</title></head><body><h1>Error loading product</h1><p>{str(e)}</p></body></html>", status_code=500)
-    
-    # For regular browsers, let React handle it
-    # This will fall through to the React app's routing
-    logger.info(f"Regular browser request for product {product_id}, letting React handle it")
-    raise HTTPException(status_code=404, detail="Not found - React will handle")
+</html>"""
+        
+        logger.info(f"Serving share page for product {product_id}")
+        return HTMLResponse(content=html_content)
+        
+    except Exception as e:
+        logger.error(f"Error serving product share page: {str(e)}")
+        return HTMLResponse(
+            content=f"<html><head><title>Error</title></head><body><h1>Error loading product</h1><p>{str(e)}</p></body></html>",
+            status_code=500
+        )
 
 # Include router
 app.include_router(api_router)
