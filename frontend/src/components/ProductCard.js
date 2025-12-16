@@ -33,6 +33,63 @@ const ProductCard = ({ product }) => {
     });
   };
 
+  const handleShare = async (e) => {
+    e.stopPropagation();
+    
+    const discountedPrice = getDiscountedPrice(selectedPriceIndex);
+    const finalPrice = discountedPrice || selectedPrice.price;
+    const discountText = product.discount_active && product.discount_percentage 
+      ? `\n🎉 ${product.discount_percentage}% OFF!` 
+      : '';
+    
+    const shareText = `🛍️ *${productName}*
+
+${productDescription}
+
+💰 Price: ₹${finalPrice}${discountedPrice ? ` (was ₹${selectedPrice.price})` : ''} for ${selectedPrice.weight}${discountText}
+
+${product.isBestSeller ? '⭐ Best Seller\n' : ''}${product.isNew ? '✨ New Product\n' : ''}
+🌐 Order now from Anantha Home Foods!
+
+🔗 Product Image: ${product.image}
+
+📱 WhatsApp: https://wa.me/919985116385`;
+
+    // Check if Web Share API is supported
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: productName,
+          text: shareText,
+          url: window.location.href
+        });
+        toast({
+          title: "✅ Shared successfully!",
+          description: "Product shared via your selected app.",
+        });
+      } catch (error) {
+        // User cancelled or error occurred
+        if (error.name !== 'AbortError') {
+          // Fallback to WhatsApp if share fails
+          shareViaWhatsApp(shareText);
+        }
+      }
+    } else {
+      // Fallback to WhatsApp for desktop browsers
+      shareViaWhatsApp(shareText);
+    }
+  };
+
+  const shareViaWhatsApp = (text) => {
+    const encodedText = encodeURIComponent(text);
+    const whatsappUrl = `https://wa.me/?text=${encodedText}`;
+    window.open(whatsappUrl, '_blank');
+    toast({
+      title: "📱 Opening WhatsApp",
+      description: "Share this product with your friends!",
+    });
+  };
+
   return (
     <>
       <div 
