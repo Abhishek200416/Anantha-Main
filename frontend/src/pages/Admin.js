@@ -1763,7 +1763,6 @@ const Admin = () => {
   React.useEffect(() => {
     if (activeTab === 'payment-settings' && isAuthenticated) {
       fetchPaymentSettings();
-      fetchRazorpayKeys();
     }
   }, [activeTab, isAuthenticated]);
 
