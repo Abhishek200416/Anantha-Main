@@ -3471,8 +3471,10 @@ const Admin = () => {
                           <p className="font-semibold mb-1">Important Notes:</p>
                           <ul className="list-disc ml-4 space-y-1">
                             <li>Use Test keys (rzp_test_) for testing and Live keys (rzp_live_) for production</li>
-                            <li>Changes take effect immediately - all new payments will use these keys</li>
+                            <li>Keys are stored in backend <code className="bg-blue-100 px-1 rounded">.env</code> file</li>
+                            <li>Changes update the .env file and take effect immediately</li>
                             <li>Keep your Key Secret confidential and never share it publicly</li>
+                            <li>No server restart required - changes are applied instantly</li>
                           </ul>
                         </div>
                       </div>
