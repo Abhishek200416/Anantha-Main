@@ -47,7 +47,7 @@ ${product.isBestSeller ? '⭐ Best Seller\n' : ''}${product.isNew ? '✨ New Pro
 
 🌐 Order now from Anantha Home Foods!
 
-🔗 Product Image: ${product.image}
+🔗 Product Link: ${window.location.origin}/product/${product.id}
 
 📱 Contact us: https://wa.me/919985116385`;
 
