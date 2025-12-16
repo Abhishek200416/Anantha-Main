@@ -359,11 +359,11 @@ ${product.isBestSeller ? '⭐ Best Seller\n' : ''}${product.isNew ? '✨ New Pro
               )}
 
               {/* Action Buttons */}
-              <div className="flex gap-4 mt-auto">
+              <div className="flex flex-col gap-4 mt-auto">
                 <button
                   onClick={handleAddToCart}
                   disabled={product.out_of_stock}
-                  className={`flex-1 py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center space-x-2 shadow-lg ${
+                  className={`w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center space-x-2 shadow-lg ${
                     product.out_of_stock
                       ? 'bg-gray-400 cursor-not-allowed text-white'
                       : 'bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 transform hover:scale-105'
@@ -373,14 +373,25 @@ ${product.isBestSeller ? '⭐ Best Seller\n' : ''}${product.isNew ? '✨ New Pro
                   <span>{product.out_of_stock ? 'Out of Stock' : 'Add to Cart'}</span>
                 </button>
                 
-                <button
-                  onClick={handleShare}
-                  className="py-4 px-6 rounded-xl font-semibold transition-all flex items-center justify-center space-x-2 shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transform hover:scale-105"
-                  title="Share this product"
-                >
-                  <Share2 className="h-6 w-6" />
-                  <span>Share</span>
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleShare}
+                    className="flex-1 py-3 rounded-xl font-semibold transition-all flex items-center justify-center space-x-2 shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transform hover:scale-105"
+                    title="Share this product"
+                  >
+                    <Share2 className="h-5 w-5" />
+                    <span className="hidden sm:inline">Share</span>
+                  </button>
+                  
+                  <button
+                    onClick={handleCopyLink}
+                    className="flex-1 py-3 rounded-xl font-semibold transition-all flex items-center justify-center space-x-2 shadow-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 transform hover:scale-105"
+                    title="Copy product link"
+                  >
+                    <Copy className="h-5 w-5" />
+                    <span className="hidden sm:inline">Copy Link</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
