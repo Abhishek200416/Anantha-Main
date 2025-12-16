@@ -280,50 +280,55 @@ function Checkout() {
   };
 
   const sendWhatsAppMessages = (orderData, orderId, trackingCode) => {
-    // Create beautifully formatted WhatsApp message with emojis
-    const message = `🎉 *NEW ORDER FROM CUSTOMER* 🎉
+    // Create professionally formatted WhatsApp message
+    // Build items list with proper formatting
+    const itemsList = orderData.items.map((item, idx) => {
+      return `${idx + 1}. *${item.name}*
+   Weight: ${item.weight}
+   Price: Rs.${item.price} x ${item.quantity} = Rs.${item.price * item.quantity}
+   Product Image: ${item.image || 'No image'}`;
+    }).join('\n\n');
 
-📋 *ORDER DETAILS*
+    const message = `*NEW ORDER RECEIVED*
+
+*ORDER DETAILS*
 Order ID: ${orderId}
 Tracking Code: ${trackingCode}
 
-━━━━━━━━━━━━━━━━━━━━━━━
-👤 *CUSTOMER INFORMATION*
-━━━━━━━━━━━━━━━━━━━━━━━
+----------------------------------
+*CUSTOMER INFORMATION*
+----------------------------------
 Name: ${orderData.customer_name}
-📞 Phone: ${orderData.phone}
-📱 WhatsApp: ${orderData.whatsapp_number}
-📧 Email: ${orderData.email}
+Phone: ${orderData.phone}
+WhatsApp: ${orderData.whatsapp_number}
+Email: ${orderData.email}
 
-━━━━━━━━━━━━━━━━━━━━━━━
-📍 *DELIVERY ADDRESS*
-━━━━━━━━━━━━━━━━━━━━━━━
-${orderData.doorNo ? `🏠 Door No: ${orderData.doorNo}\n` : ''}${orderData.building ? `🏢 Building: ${orderData.building}\n` : ''}${orderData.street ? `🛣️ Street: ${orderData.street}\n` : ''}🌆 City: ${orderData.city}
-🗺️ State: ${orderData.state}
-📮 Pincode: ${orderData.pincode}
+----------------------------------
+*DELIVERY ADDRESS*
+----------------------------------
+${orderData.doorNo ? `Door No: ${orderData.doorNo}\n` : ''}${orderData.building ? `Building: ${orderData.building}\n` : ''}${orderData.street ? `Street: ${orderData.street}\n` : ''}City: ${orderData.city}
+State: ${orderData.state}
+Pincode: ${orderData.pincode}
 
-━━━━━━━━━━━━━━━━━━━━━━━
-🛍️ *ORDER ITEMS*
-━━━━━━━━━━━━━━━━━━━━━━━
-${orderData.items.map((item, idx) => `${idx + 1}️⃣ *${item.name}*
-   ⚖️ Weight: ${item.weight}
-   💰 Price: ₹${item.price} × ${item.quantity} = ₹${item.price * item.quantity}
-   🖼️ Product Image: ${item.image || 'No image'}`).join('\n\n')}
+----------------------------------
+*ORDER ITEMS*
+----------------------------------
+${itemsList}
 
-━━━━━━━━━━━━━━━━━━━━━━━
-💵 *PAYMENT SUMMARY*
-━━━━━━━━━━━━━━━━━━━━━━━
-Subtotal: ₹${orderData.subtotal}
-🚚 Delivery Charge: ₹${orderData.delivery_charge}
-━━━━━━━━━━━━━━━━━━━━━━━
-💸 *TOTAL: ₹${orderData.total}*
-━━━━━━━━━━━━━━━━━━━━━━━
+----------------------------------
+*PAYMENT SUMMARY*
+----------------------------------
+Subtotal: Rs.${orderData.subtotal}
+Delivery Charge: Rs.${orderData.delivery_charge}
+----------------------------------
+*TOTAL: Rs.${orderData.total}*
+----------------------------------
 
-💳 Payment Method: ${orderData.payment_method === 'razorpay' ? '💳 Online Payment (Razorpay)' : '📱 WhatsApp Booking'}
-✅ Payment Status: ${orderData.payment_status === 'completed' ? '✅ PAID' : '⏳ Pending'}
+Payment Method: ${orderData.payment_method === 'razorpay' ? 'Online Payment (Razorpay)' : 'WhatsApp Booking'}
+Payment Status: ${orderData.payment_status === 'completed' ? 'PAID' : 'Pending'}
 
-🌐 _Order placed via Anantha Home Foods_
-📷 _Click product image links above to view_`;
+_Order placed via Anantha Home Foods_
+_Click product image links above to view products_`;
 
     const encodedMessage = encodeURIComponent(message);
 
