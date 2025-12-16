@@ -78,3 +78,23 @@ agenthub/agents/youtube/db
 
 # Mobile development
 android-sdk/ frontend/node_modules/.cache/default-development/0.pack
+
+# Testing and temporary files
+*_test.py
+test_*.py
+*_old.py
+debug_*.py
+
+# Documentation and summary files (keep README.md only)
+CHANGES_*.md
+FIXES_*.md
+IMPLEMENTATION_*.md
+CURRENT_STATE_*.md
+
+# Seed files (data already in database)
+seed_*.py
+import_products.py
+add_*.py
+
+# Backend misplaced files
+backend/yarn.lock
