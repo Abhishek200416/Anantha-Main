@@ -24,6 +24,10 @@ import razorpay
 import hmac
 import hashlib
 
+# Import utility functions
+from utils.helpers import generate_order_id, generate_tracking_code, calculate_haversine_distance
+from utils.admin_manager import ensure_admin_exists_mongodb
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
@@ -36,7 +40,7 @@ db = client[os.environ['DB_NAME']]
 razorpay_client = razorpay.Client(auth=(os.environ.get('RAZORPAY_KEY_ID', ''), os.environ.get('RAZORPAY_KEY_SECRET', '')))
 
 # Create the main app
-app = FastAPI()
+app = FastAPI(title="Anantha Lakshmi Food Delivery API - MongoDB Version")
 
 # Create API router
 api_router = APIRouter(prefix="/api")
@@ -47,6 +51,18 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Startup event - Auto-create admin from .env
+@app.on_event("startup")
+async def startup_event():
+    """Initialize application on startup"""
+    logger.info("🚀 Starting Anantha Lakshmi API Server (MongoDB)")
+    try:
+        # Auto-create/update admin user from .env
+        await ensure_admin_exists_mongodb(db)
+        logger.info("✅ Server startup completed successfully")
+    except Exception as e:
+        logger.error(f"❌ Error during startup: {e}")
 
 # Add validation error handler to log details
 @app.exception_handler(RequestValidationError)
