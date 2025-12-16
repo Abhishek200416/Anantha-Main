@@ -9,7 +9,7 @@ import json
 import time
 from datetime import datetime
 
-BACKEND_URL = "https://easy-whatsapp-send.preview.emergentagent.com/api"
+BACKEND_URL = "https://quickshare-70.preview.emergentagent.com/api"
 
 def admin_login():
     """Login as admin and get auth token"""
