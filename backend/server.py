@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Depends, File, UploadFile, Header, Request, Form
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
