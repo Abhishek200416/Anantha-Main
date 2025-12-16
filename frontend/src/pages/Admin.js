@@ -1810,7 +1810,6 @@ const Admin = () => {
               Login
             </button>
           </form>
-          <p className="text-sm text-gray-500 mt-4 text-center">Default: admin@ananthalakshmi.com / admin123</p>
         </div>
       </div>
     );
