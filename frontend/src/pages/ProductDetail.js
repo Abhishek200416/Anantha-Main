@@ -167,6 +167,39 @@ ${product.isBestSeller ? '⭐ Best Seller\n' : ''}${product.isNew ? '✨ New Pro
     });
   };
 
+  const handleCopyLink = async () => {
+    const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
+    const shareUrl = `${backendUrl}/api/share/product/${productId}`;
+    
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast({
+        title: "✅ Link Copied!",
+        description: "Product link copied to clipboard. Paste it anywhere to share!",
+      });
+    } catch (error) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = shareUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        toast({
+          title: "✅ Link Copied!",
+          description: "Product link copied to clipboard.",
+        });
+      } catch (err) {
+        toast({
+          title: "❌ Copy Failed",
+          description: "Please copy the link manually: " + shareUrl,
+          variant: "destructive"
+        });
+      }
+      document.body.removeChild(textArea);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center">
