@@ -704,12 +704,6 @@ const Admin = () => {
   const [paymentStatus, setPaymentStatus] = useState('enabled');
   const [paymentStatusSaved, setPaymentStatusSaved] = useState(false);
   
-  // Razorpay API Keys state
-  const [razorpayKeyId, setRazorpayKeyId] = useState('');
-  const [razorpayKeySecret, setRazorpayKeySecret] = useState('');
-  const [razorpayKeysLoading, setRazorpayKeysLoading] = useState(false);
-  const [razorpayKeysSaved, setRazorpayKeysSaved] = useState(false);
-  
   // WhatsApp Numbers state
   const [whatsappNumbers, setWhatsappNumbers] = useState([]);
   const [showAddWhatsApp, setShowAddWhatsApp] = useState(false);
