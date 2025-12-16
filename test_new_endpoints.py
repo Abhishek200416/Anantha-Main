@@ -13,7 +13,7 @@ import io
 from PIL import Image
 
 # Backend URL from environment
-BACKEND_URL = "https://recipe-finder-226.preview.emergentagent.com/api"
+BACKEND_URL = "https://env-config-tool.preview.emergentagent.com/api"
 
 def test_api_endpoint(method, endpoint, headers=None, data=None, files=None, description="", expected_status=None):
     """Test a single API endpoint"""

@@ -6,7 +6,7 @@ Debug City Detection Issue
 import requests
 import json
 
-BACKEND_URL = "https://recipe-finder-226.preview.emergentagent.com/api"
+BACKEND_URL = "https://env-config-tool.preview.emergentagent.com/api"
 
 def test_city_in_locations():
     """Test if Hyderabad is in locations"""

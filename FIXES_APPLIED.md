@@ -202,7 +202,7 @@ const majorCities = relevantLocations.filter(loc =>
 - ✅ Frontend recompiled successfully
 - ✅ Backend running (no changes needed)
 - ✅ Database populated (58 products, 431 cities)
-- ✅ Application URL: https://recipe-finder-226.preview.emergentagent.com
+- ✅ Application URL: https://env-config-tool.preview.emergentagent.com
 
 ---
 
