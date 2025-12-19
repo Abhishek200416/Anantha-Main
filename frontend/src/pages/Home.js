@@ -6,7 +6,7 @@ import AddCityModal from '../components/AddCityModal';
 import { useAdmin } from '../contexts/AdminContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../translations/translations';
-import { Sparkles, X, ArrowRight, MapPin, Plus, Globe } from 'lucide-react';
+import { Sparkles, X, ArrowRight, MapPin, Plus, Globe, Search } from 'lucide-react';
 import axios from 'axios';
 import imagePreloader from '../utils/imagePreloader';
 
