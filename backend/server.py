@@ -1694,6 +1694,8 @@ async def update_order_admin_fields(order_id: str, data: dict, current_user: dic
         update_fields["delivery_days"] = data["delivery_days"]
     if "order_status" in data:
         update_fields["order_status"] = data["order_status"]
+    if "payment_status" in data:
+        update_fields["payment_status"] = data["payment_status"]
     
     if not update_fields:
         raise HTTPException(status_code=400, detail="No fields to update")
@@ -1704,6 +1706,7 @@ async def update_order_admin_fields(order_id: str, data: dict, current_user: dic
         raise HTTPException(status_code=404, detail="Order not found")
     
     old_status = order.get("order_status", "")
+    old_payment_status = order.get("payment_status", "")
     
     result = await db.orders.update_one(
         {"order_id": order_id},
@@ -1719,6 +1722,8 @@ async def update_order_admin_fields(order_id: str, data: dict, current_user: dic
             logger.info(f"Attempting to send order status update email to {order.get('email')} for order {order_id}")
             # Update order data with new status for email
             order["order_status"] = update_fields["order_status"]
+            if "payment_status" in update_fields:
+                order["payment_status"] = update_fields["payment_status"]
             email_sent = await send_order_status_update_email(order["email"], order, old_status, update_fields["order_status"])
             if email_sent:
                 logger.info(f"✅ Order status update email sent successfully to {order.get('email')}")
@@ -1726,6 +1731,29 @@ async def update_order_admin_fields(order_id: str, data: dict, current_user: dic
                 logger.warning(f"⚠️ Order status update email function returned False for {order.get('email')}")
         except Exception as e:
             logger.error(f"❌ Failed to send order status update email: {str(e)}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            # Don't fail the request if email fails
+    
+    # Send email notification if payment status was changed (even if order status didn't change)
+    if "payment_status" in update_fields and old_payment_status != update_fields["payment_status"] and order.get("email"):
+        try:
+            logger.info(f"💳 Payment status changed from '{old_payment_status}' to '{update_fields['payment_status']}' for order {order_id}")
+            logger.info(f"Attempting to send payment status update email to {order.get('email')}")
+            # Update order data with new payment status for email
+            order["payment_status"] = update_fields["payment_status"]
+            if "order_status" in update_fields:
+                order["order_status"] = update_fields["order_status"]
+            
+            # Send email with order summary and payment status
+            from gmail_service import send_payment_status_update_email
+            email_sent = await send_payment_status_update_email(order["email"], order, old_payment_status, update_fields["payment_status"])
+            if email_sent:
+                logger.info(f"✅ Payment status update email sent successfully to {order.get('email')}")
+            else:
+                logger.warning(f"⚠️ Payment status update email function returned False for {order.get('email')}")
+        except Exception as e:
+            logger.error(f"❌ Failed to send payment status update email: {str(e)}")
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
             # Don't fail the request if email fails
