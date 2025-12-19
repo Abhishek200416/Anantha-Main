@@ -666,6 +666,23 @@ const AdminOrders = () => {
 
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Payment Status
+                            </label>
+                            <select
+                              value={editData.payment_status || order.payment_status}
+                              onChange={(e) => setEditData(prev => ({ ...prev, payment_status: e.target.value }))}
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            >
+                              <option value="pending">⏳ Pending</option>
+                              <option value="completed">✅ Completed</option>
+                              <option value="failed">❌ Failed</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                               Delivery Days
                             </label>
                             <input
