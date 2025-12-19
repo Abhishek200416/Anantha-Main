@@ -30,6 +30,7 @@ const Home = () => {
   const [locationNotification, setLocationNotification] = useState(null);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const t = (key) => getTranslation(language, key);
 
