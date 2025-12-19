@@ -679,3 +679,164 @@ async def send_payment_completion_email(to_email: str, order_data: dict):
         logger.error(f"Failed to send payment completion email via Gmail: {str(e)}")
         return False
 
+
+async def send_payment_status_update_email(to_email: str, order_data: dict, old_status: str, new_status: str):
+    """Send payment status update email with order summary"""
+    try:
+        GMAIL_EMAIL, GMAIL_APP_PASSWORD = get_gmail_credentials()
+        
+        if not GMAIL_EMAIL or not GMAIL_APP_PASSWORD:
+            logger.warning("Gmail credentials not configured. Email not sent.")
+            logger.info(f"Would send payment status email to: {to_email} for order: {order_data.get('order_id', 'N/A')}")
+            return False
+            
+        # Create message
+        msg = MIMEMultipart('alternative')
+        
+        # Set subject based on payment status
+        if new_status == 'completed':
+            msg['Subject'] = f'✅ Payment Confirmed - Order #{order_data.get("order_id", "N/A")}'
+            status_message = "Your payment has been successfully received!"
+            status_color = "#16a34a"  # Green
+            status_emoji = "✅"
+        elif new_status == 'failed':
+            msg['Subject'] = f'❌ Payment Failed - Order #{order_data.get("order_id", "N/A")}'
+            status_message = "Unfortunately, your payment could not be processed."
+            status_color = "#dc2626"  # Red
+            status_emoji = "❌"
+        else:  # pending
+            msg['Subject'] = f'⏳ Payment Pending - Order #{order_data.get("order_id", "N/A")}'
+            status_message = "Your payment is currently pending."
+            status_color = "#f59e0b"  # Yellow
+            status_emoji = "⏳"
+        
+        msg['From'] = f'Anantha Home Foods <{GMAIL_EMAIL}>'
+        msg['To'] = to_email
+        
+        # Format items HTML
+        items_html = ""
+        for item in order_data.get("items", []):
+            items_html += f'''
+            <div style="padding: 10px; border-bottom: 1px solid #e5e7eb;">
+                <p><strong>{item.get("name", "N/A")}</strong> ({item.get("weight", "N/A")})</p>
+                <p>Quantity: {item.get("quantity", 0)} × Rs.{item.get("price", 0)} = Rs.{item.get("quantity", 0) * item.get("price", 0)}</p>
+            </div>
+            '''
+        
+        # Format address
+        if order_data.get("doorNo"):
+            address_html = f'''
+            {order_data.get("doorNo", "")}, {order_data.get("building", "")}<br>
+            {order_data.get("street", "")}<br>
+            {order_data.get("city", "")}, {order_data.get("state", "")} - {order_data.get("pincode", "")}
+            '''
+        else:
+            address_html = f'{order_data.get("address", "")}'
+        
+        # Additional message based on status
+        additional_message = ""
+        if new_status == 'completed':
+            additional_message = '''
+            <div style="background-color: #f0fdf4; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #16a34a;">
+                <p style="margin: 0;"><strong>🎉 Great News!</strong></p>
+                <p style="margin: 5px 0 0 0;">Your order is now confirmed and will be processed shortly. We'll send you another update when your order is shipped!</p>
+            </div>
+            '''
+        elif new_status == 'failed':
+            additional_message = '''
+            <div style="background-color: #fef2f2; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #dc2626;">
+                <p style="margin: 0;"><strong>⚠️ What to do next?</strong></p>
+                <p style="margin: 5px 0 0 0;">Please contact us at <strong>9985116385</strong> to complete your payment via WhatsApp or alternative methods. Your order is still reserved for you!</p>
+            </div>
+            '''
+        else:  # pending
+            additional_message = '''
+            <div style="background-color: #fffbeb; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+                <p style="margin: 0;"><strong>ℹ️ Payment Pending</strong></p>
+                <p style="margin: 5px 0 0 0;">We're waiting for your payment confirmation. You can complete the payment via WhatsApp at <strong>9985116385</strong>.</p>
+            </div>
+            '''
+        
+        html_content = f'''
+        <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+                <h2 style="color: {status_color}; text-align: center;">{status_emoji} Payment Status Update</h2>
+                <p>Dear {order_data.get("customer_name", "Customer")},</p>
+                <p><strong>{status_message}</strong></p>
+                
+                {additional_message}
+                
+                <div style="background-color: #fff7ed; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                    <h3 style="color: #ea580c; margin-top: 0;">Order Summary</h3>
+                    <p><strong>Order ID:</strong> {order_data.get("order_id", "N/A")}</p>
+                    <p><strong>Tracking Code:</strong> {order_data.get("tracking_code", "N/A")}</p>
+                    <p><strong>Order Status:</strong> <span style="text-transform: capitalize;">{order_data.get("order_status", "pending")}</span></p>
+                    <p><strong>Payment Status:</strong> <span style="color: {status_color}; font-weight: bold; text-transform: capitalize;">{new_status}</span></p>
+                    <p><strong>Total Amount:</strong> Rs.{order_data.get("total", 0)}</p>
+                </div>
+                
+                <div style="background-color: #f0fdf4; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                    <h3 style="color: #16a34a; margin-top: 0;">Delivery Address</h3>
+                    <p>{address_html}<br>
+                    {order_data.get("location", "N/A")}</p>
+                    <p><strong>Phone:</strong> {order_data.get("phone", "N/A")}</p>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h3 style="color: #1e40af;">Items Ordered</h3>
+                    {items_html}
+                </div>
+                
+                <div style="background-color: #e0f2fe; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                    <h4 style="margin-top: 0;">📦 Order Summary</h4>
+                    <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                        <span>Subtotal:</span>
+                        <span><strong>Rs.{order_data.get("subtotal", 0)}</strong></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                        <span>Delivery Charge:</span>
+                        <span><strong>Rs.{order_data.get("delivery_charge", 0)}</strong></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-top: 2px solid #0369a1; margin-top: 5px;">
+                        <span style="font-size: 18px; font-weight: bold;">Total:</span>
+                        <span style="font-size: 18px; font-weight: bold; color: #16a34a;">Rs.{order_data.get("total", 0)}</span>
+                    </div>
+                </div>
+                
+                <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                    <h4 style="margin-top: 0;">📞 Need Help?</h4>
+                    <p>If you have any questions about your payment or order, please contact us:</p>
+                    <ul style="margin: 10px 0;">
+                        <li><strong>WhatsApp:</strong> 9985116385</li>
+                        <li><strong>Email:</strong> {GMAIL_EMAIL}</li>
+                    </ul>
+                </div>
+                
+                <p style="text-align: center; color: #666; margin-top: 30px; font-size: 12px;">
+                    Thank you for choosing Anantha Home Foods!<br>
+                    Handcrafted with love and tradition 💚
+                </p>
+            </div>
+        </body>
+        </html>
+        '''
+        
+        # Attach HTML content
+        html_part = MIMEText(html_content, 'html')
+        msg.attach(html_part)
+        
+        # Send email using Gmail SMTP
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+            server.login(GMAIL_EMAIL, GMAIL_APP_PASSWORD)
+            server.send_message(msg)
+        
+        logger.info(f"💳 Payment status update email sent successfully to {to_email} (Status: {old_status} → {new_status})")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Failed to send payment status update email: {str(e)}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return False
+
