@@ -549,6 +549,38 @@ const Home = () => {
         
         <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
         
+        {/* Search Bar */}
+        <div className="mt-6 mb-4">
+          <div className="relative max-w-2xl mx-auto">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search products by name, description, or category..."
+              className="w-full pl-12 pr-12 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent shadow-sm text-gray-700 placeholder-gray-400 transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            )}
+          </div>
+          {searchQuery && (
+            <div className="text-center mt-3">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">
+                <Search className="h-4 w-4" />
+                Searching for: "{searchQuery}" • {filteredProducts.length} results found
+              </span>
+            </div>
+          )}
+        </div>
+        
         {/* Loading State - Show while products/images are loading */}
         {loadingProducts && (
           <div className="flex flex-col items-center justify-center py-16 md:py-24">
