@@ -299,6 +299,20 @@ const Home = () => {
       ? products
       : products.filter(p => p.category === selectedCategory);
     
+    // Apply search filter if search query exists
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      categoryFiltered = categoryFiltered.filter(product => {
+        const nameMatch = product.name?.toLowerCase().includes(query);
+        const descriptionMatch = product.description?.toLowerCase().includes(query);
+        const categoryMatch = product.category?.toLowerCase().includes(query);
+        const nameTeluguMatch = product.name_telugu?.toLowerCase().includes(query);
+        const descriptionTeluguMatch = product.description_telugu?.toLowerCase().includes(query);
+        
+        return nameMatch || descriptionMatch || categoryMatch || nameTeluguMatch || descriptionTeluguMatch;
+      });
+    }
+    
     // Sort products: Best Sellers first, then Festival, then others (random)
     const bestSellers = categoryFiltered.filter(p => p.isBestSeller && !p.isFestival);
     const festivalProducts = categoryFiltered.filter(p => p.isFestival);
@@ -309,7 +323,7 @@ const Home = () => {
     
     // Combine: Best Sellers → Festival → Random Regular
     return [...bestSellers, ...festivalProducts, ...shuffledRegular];
-  }, [products, selectedCategory]);
+  }, [products, selectedCategory, searchQuery]);
 
   // Memoize best sellers to prevent unnecessary filtering
   const bestSellers = useMemo(() => {
