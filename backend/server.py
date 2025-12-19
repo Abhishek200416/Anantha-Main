@@ -3170,7 +3170,7 @@ async def share_product_with_meta(product_id: str, request: Request):
             price_text = f"Starting from ₹{first_price.get('price', 0)} for {first_price.get('weight', '')}"
         
         # Build absolute URLs
-        base_url = os.getenv('REACT_APP_BACKEND_URL', 'https://delivery-manager-45.preview.emergentagent.com')
+        base_url = os.getenv('REACT_APP_BACKEND_URL', 'https://payment-manager-66.preview.emergentagent.com')
         if base_url.endswith('/api'):
             base_url = base_url[:-4]
         product_url = f"{base_url}/product/{product_id}"
