@@ -736,6 +736,7 @@ const AdminOrders = () => {
                             setEditingOrder(order.id);
                             setEditData({
                               order_status: order.order_status,
+                              payment_status: order.payment_status || 'pending',
                               admin_notes: order.admin_notes || '',
                               delivery_days: order.delivery_days || ''
                             });
